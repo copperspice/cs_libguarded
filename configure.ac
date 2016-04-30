@@ -1,0 +1,25 @@
+AC_INIT(libguarded, 1.0.0)
+
+AC_CONFIG_AUX_DIR(autotools/build-aux)
+AC_CONFIG_MACRO_DIR([autotools/m4])
+AC_CONFIG_SRCDIR([test/guarded.cpp])
+AM_INIT_AUTOMAKE([foreign])
+
+AC_PROG_CC_C99
+AM_PROG_CC_C_O
+AC_PROG_CXX
+AC_PROG_LD
+AC_PROG_INSTALL
+AC_PROG_LIBTOOL
+
+AC_LANG([C++])
+AX_CXX_COMPILE_STDCXX(14, [noext], [optional])
+AX_CXX_COMPILE_STDCXX(11, [noext])
+
+AX_BOOST_BASE([1.40])
+AX_PTHREAD([], [true])
+
+AM_CONDITIONAL(CXX14, test "$HAVE_CXX14" == "1")
+
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
