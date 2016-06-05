@@ -16,6 +16,7 @@ libguarded_HEADERS = \
 	include/libguarded/ordered_guarded.hpp \
 	include/libguarded/shared_guarded.hpp
 
+EXTRA_DIST= LICENSE README
 
 TESTS=bin/unittest
 

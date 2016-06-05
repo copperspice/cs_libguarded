@@ -1,0 +1,17 @@
+libGuarded is a library for multithreaded programming. It provides
+templated classes which prevent race conditions by controlling access
+to shared data.
+
+libGuarded is a standalone header-only library. The only requirement
+is a C++11 compliant compiler and standard library. The autotools
+build system is used only for building and running the unit test
+suite.
+
+Class level documentation is available on the CopperSpice website:
+
+http://www.copperspice.com/documentation.html
+
+For additional background information the multithreading presentations
+given at CppNow are also available:
+
+http://www.copperspice.com/presentations.html
