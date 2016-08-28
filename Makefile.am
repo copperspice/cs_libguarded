@@ -2,19 +2,19 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 ACLOCAL_AMFLAGS=-I autotools/m4
 
-AM_CFLAGS = -Wall -I$(srcdir)/include
-AM_CXXFLAGS = -Wall -I$(srcdir)/include
+AM_CFLAGS = -Wall -I$(srcdir)/src
+AM_CXXFLAGS = -Wall -I$(srcdir)/src
 
 
-libguardeddir = $(includedir)/libguarded
+libguardeddir = $(srcdir)/libguarded
 
 libguarded_HEADERS = \
-	include/libguarded/cow_guarded.hpp \
-	include/libguarded/deferred_guarded.hpp \
-	include/libguarded/guarded.hpp \
-	include/libguarded/lr_guarded.hpp \
-	include/libguarded/ordered_guarded.hpp \
-	include/libguarded/shared_guarded.hpp
+	src/libguarded/cow_guarded.hpp \
+	src/libguarded/deferred_guarded.hpp \
+	src/libguarded/guarded.hpp \
+	src/libguarded/lr_guarded.hpp \
+	src/libguarded/ordered_guarded.hpp \
+	src/libguarded/shared_guarded.hpp
 
 EXTRA_DIST= LICENSE README
 
