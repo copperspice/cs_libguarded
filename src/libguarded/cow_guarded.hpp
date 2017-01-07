@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Ansel Sermersheim
+ * Copyright 2016-2017 Ansel Sermersheim
  *
  * All rights reserved
  *
