@@ -14,6 +14,8 @@ libguarded_HEADERS = \
 	src/libguarded/guarded.hpp \
 	src/libguarded/lr_guarded.hpp \
 	src/libguarded/ordered_guarded.hpp \
+	src/libguarded/rcu_guarded.hpp \
+	src/libguarded/rcu_list.hpp \
 	src/libguarded/shared_guarded.hpp
 
 EXTRA_DIST= LICENSE README
@@ -27,7 +29,8 @@ bin_unittest_LIBS=${PTHREAD_LIBS}
 bin_unittest_SOURCES = \
 	test/cow_guarded.cpp \
 	test/guarded.cpp \
-	test/lr_guarded.cpp 
+	test/lr_guarded.cpp \
+	test/rcu_guarded.cpp
 
 if CXX14
 bin_unittest_SOURCES += \
