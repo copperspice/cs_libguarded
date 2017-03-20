@@ -1,18 +1,20 @@
-/*
- * Copyright 2016-2017 Ansel Sermersheim
- *
- * All rights reserved
- *
- * This file is part of libguarded. Libguarded is free software
- * released under the BSD 2-clause license. For more information see
- * the LICENCE file provided with this project.
- */
+/***********************************************************************
+*
+* Copyright (c) 2015-2017 Ansel Sermersheim
+* All rights reserved.
+*
+* This file is part of libguarded
+*
+* libguarded is free software, released under the BSD 2-Clause license.
+* For license details refer to LICENSE provided with this project.
+*
+***********************************************************************/
 
-#ifndef INCLUDED_LIBGUARDED_RCU_LIST_HPP
-#define INCLUDED_LIBGUARDED_RCU_LIST_HPP
+#ifndef LIBGUARDED_RCU_LIST_HPP
+#define LIBGUARDED_RCU_LIST_HPP
 
-#include <memory>
 #include <atomic>
+#include <memory>
 #include <mutex>
 
 namespace libguarded
