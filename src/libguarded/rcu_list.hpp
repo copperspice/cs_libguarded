@@ -40,7 +40,12 @@ class rcu_list
     using rcu_read_guard  = rcu_guard;
 
     rcu_list();
-    explicit rcu_list(const Alloc & alloc);
+    explicit rcu_list(const Alloc &alloc);
+
+    rcu_list(const rcu_list &) = delete;
+    rcu_list(rcu_list &&) = delete;
+    rcu_list &operator=(const rcu_list &) = delete;
+    rcu_list &operator=(rcu_list &&) = delete;
 
     ~rcu_list();
 
@@ -54,7 +59,7 @@ class rcu_list
     void clear();
 
     iterator insert(const_iterator pos, T value);
-    iterator insert(const_iterator pos, size_type count, const T & value);
+    iterator insert(const_iterator pos, size_type count, const T &value);
 
     template <typename InputIter>
     iterator insert(const_iterator pos, InputIter first, InputIter last);
@@ -65,8 +70,10 @@ class rcu_list
 
     void push_front(T value);
     void push_back(T value);
+
     template <typename... Us>
     void emplace_front(Us &&... vs);
+
     template <typename... Us>
     void emplace_back(Us &&... vs);
 
@@ -77,36 +84,39 @@ class rcu_list
         // uncopyable, unmoveable
         node(const node &) = delete;
         node(node &&) = delete;
-        node & operator=(const node &) = delete;
-        node & operator=(node &&) = delete;
+        node &operator=(const node &) = delete;
+        node &operator=(node &&) = delete;
+
         template <typename... Us>
         explicit node(Us &&... vs)
-            : next(nullptr), back(nullptr), deleted(false), data(std::forward<Us>(vs)...)
+            : data(std::forward<Us>(vs)...)
         {
         }
 
-        std::atomic<node *> next;
-        std::atomic<node *> back;
-        bool deleted;
+        std::atomic<node *> next{nullptr};
+        std::atomic<node *> back{nullptr};
+        bool deleted{false};
         T data;
     };
 
     struct zombie_list_node {
-        zombie_list_node() = default;
+        zombie_list_node(node *n) : zombie_node(n)
+        {
+        }
+
+        zombie_list_node(rcu_guard *g) : owner(g)
+        {
+        }
+
         // uncopyable, unmoveable
         zombie_list_node(const zombie_list_node &) = delete;
         zombie_list_node(zombie_list_node &&) = delete;
-        zombie_list_node & operator=(const zombie_list_node &) = delete;
-        zombie_list_node & operator=(zombie_list_node &&) = delete;
+        zombie_list_node &operator=(const zombie_list_node &) = delete;
+        zombie_list_node &operator=(zombie_list_node &&) = delete;
 
-        ~zombie_list_node()
-        {
-            delete zombie_node;
-        }
-
-        std::shared_ptr<zombie_list_node> next{nullptr};
-        std::atomic<void *> owner{nullptr};
-        node * zombie_node{nullptr};
+        std::atomic<zombie_list_node *> next{nullptr};
+        std::atomic<rcu_guard *> owner{nullptr};
+        node *zombie_node{nullptr};
     };
 
     using alloc_trait             = std::allocator_traits<Alloc>;
@@ -115,10 +125,10 @@ class rcu_list
     using zombie_node_alloc_t     = typename alloc_trait::template rebind_alloc<node>;
     using zombie_node_alloc_trait = std::allocator_traits<zombie_node_alloc_t>;
 
-    std::atomic<node *> m_head;
-    std::atomic<node *> m_tail;
+    std::atomic<node *> m_head{nullptr};
+    std::atomic<node *> m_tail{nullptr};
 
-    std::shared_ptr<zombie_list_node> m_zombie_head;
+    mutable std::atomic<zombie_list_node *> m_zombie_head{nullptr};
 
     M m_write_mutex;
 
@@ -132,48 +142,36 @@ class rcu_list<T, M, Alloc>::rcu_guard
 {
 
   public:
-    void rcu_read_lock(const rcu_list<T, M, Alloc> & list);
+    void rcu_read_lock(const rcu_list<T, M, Alloc> &list);
 
-    void rcu_read_unlock(const rcu_list<T, M, Alloc> & list);
+    void rcu_read_unlock(const rcu_list<T, M, Alloc> &list);
 
-    void rcu_write_lock(const rcu_list<T, M, Alloc> & list);
+    void rcu_write_lock(const rcu_list<T, M, Alloc> &list);
 
-    void rcu_write_unlock(const rcu_list<T, M, Alloc> & list);
+    void rcu_write_unlock(const rcu_list<T, M, Alloc> &list);
 
   private:
     void unlock();
 
-    std::shared_ptr<zombie_list_node> m_zombie;
+    zombie_list_node *m_zombie;
+    const rcu_list<T, M, Alloc> *m_list;
 };
 
 template <typename T, typename M, typename Alloc>
-void rcu_list<T, M, Alloc>::rcu_guard::rcu_read_lock(const rcu_list<T, M, Alloc> & list)
+void rcu_list<T, M, Alloc>::rcu_guard::rcu_read_lock(const rcu_list<T, M, Alloc> &list)
+
 {
-    m_zombie = atomic_load_explicit(&(list.m_zombie_head), std::memory_order_relaxed);
+    m_list                    = &list;
+    m_zombie                  = new zombie_list_node(this);
+    zombie_list_node *oldNext = list.m_zombie_head.load(std::memory_order_relaxed);
 
-    if (m_zombie == nullptr) {
-        return;
-    }
-
-    void * current_owner = nullptr;
-    if (m_zombie->owner.compare_exchange_strong(current_owner, this, std::memory_order_relaxed)) {
-
-        std::shared_ptr<zombie_list_node> n =
-            atomic_load_explicit(&(m_zombie->next), std::memory_order_relaxed);
-
-        while (n) {
-            current_owner = nullptr;
-            if (!n->owner.compare_exchange_strong(current_owner, this, std::memory_order_relaxed)) {
-                break;
-            }
-
-            n = atomic_load_explicit(&(m_zombie->next), std::memory_order_relaxed);
-        }
-    }
+    do {
+        m_zombie->next.store(oldNext, std::memory_order_relaxed);
+    } while (!list.m_zombie_head.compare_exchange_weak(oldNext, m_zombie));
 }
 
 template <typename T, typename M, typename Alloc>
-void rcu_list<T, M, Alloc>::rcu_guard::rcu_read_unlock(const rcu_list<T, M, Alloc> & list)
+void rcu_list<T, M, Alloc>::rcu_guard::rcu_read_unlock(const rcu_list<T, M, Alloc> &list)
 {
     unlock();
 };
@@ -181,41 +179,34 @@ void rcu_list<T, M, Alloc>::rcu_guard::rcu_read_unlock(const rcu_list<T, M, Allo
 template <typename T, typename M, typename Alloc>
 void rcu_list<T, M, Alloc>::rcu_guard::unlock()
 {
-    std::shared_ptr<zombie_list_node> n = m_zombie;
-
-    if (n == nullptr) {
-        return;
-    }
-
-    bool first = true;
+    zombie_list_node *n = m_list->m_zombie_head.load();
+    n                   = m_zombie->next.load();
 
     while (n) {
-        if (n->owner.load(std::memory_order_relaxed) != this) {
-            if (first) {
-                return;
-            } else {
-                break;
-            }
+        if (n->owner.load() != nullptr) {
+            break;
         }
 
-	n = atomic_load(&(n->next));
+        node *deadNode = n->zombie_node;
+        delete deadNode;
+
+        zombie_list_node *oldnode = n;
+        n                         = n->next.load();
+        delete oldnode;
     }
 
-    // We are about to potentially cause some deletions. We need to do an acquire to make
-    // sure that we see the zombie address which may have been just released by a writer
-    // is visible before the zombie_node destructor runs.
-    atomic_store(&(m_zombie->next), n);
-    atomic_store(&(m_zombie->owner), static_cast<void *>(nullptr));
+    m_zombie->next.store(n);
+    m_zombie->owner.store(nullptr);
 }
 
 template <typename T, typename M, typename Alloc>
-void rcu_list<T, M, Alloc>::rcu_guard::rcu_write_lock(const rcu_list<T, M, Alloc> & list)
+void rcu_list<T, M, Alloc>::rcu_guard::rcu_write_lock(const rcu_list<T, M, Alloc> &list)
 {
     rcu_read_lock(list);
 }
 
 template <typename T, typename M, typename Alloc>
-void rcu_list<T, M, Alloc>::rcu_guard::rcu_write_unlock(const rcu_list<T, M, Alloc> & list)
+void rcu_list<T, M, Alloc>::rcu_guard::rcu_write_unlock(const rcu_list<T, M, Alloc> &list)
 {
     rcu_read_unlock(list);
 }
@@ -232,36 +223,39 @@ class rcu_list<T, M, Alloc>::iterator
     using reference         = const T &;
     using difference_type   = size_t;
 
-    iterator() : m_current(nullptr){};
+    iterator() : m_current(nullptr)
+    {
+    }
 
-    const T & operator*() const
+    const T &operator*() const
     {
         return m_current->data;
-    };
-    const T * operator->() const
+    }
+
+    const T *operator->() const
     {
         return &(m_current->data);
-    };
+    }
 
-    bool operator==(const const_iterator & other) const
+    bool operator==(const const_iterator &other) const
     {
         return m_current == other.m_current;
     }
 
-    bool operator!=(const const_iterator & other) const
+    bool operator!=(const const_iterator &other) const
     {
         return m_current != other.m_current;
     }
 
-    iterator & operator++()
+    iterator &operator++()
     {
-        m_current = m_current->next;
+        m_current = m_current->next.load();
         return *this;
     }
 
-    const_iterator & operator--()
+    const_iterator &operator--()
     {
-        m_current = m_current->prev;
+        m_current = m_current->prev.load();
         return *this;
     }
 
@@ -283,11 +277,15 @@ class rcu_list<T, M, Alloc>::iterator
     friend rcu_list<T, M, Alloc>;
     friend rcu_list<T, M, Alloc>::const_iterator;
 
-    explicit iterator(const rcu_list<T, M, Alloc>::const_iterator & it) : m_current(it.m_current){};
+    explicit iterator(const rcu_list<T, M, Alloc>::const_iterator &it) : m_current(it.m_current)
+    {
+    }
 
-    explicit iterator(node * n) : m_current(n){};
+    explicit iterator(node *n) : m_current(n)
+    {
+    }
 
-    node * m_current;
+    node *m_current;
 };
 
 /*----------------------------------------*/
@@ -303,36 +301,36 @@ class rcu_list<T, M, Alloc>::const_iterator
     using difference_type   = size_t;
 
     const_iterator() : m_current(nullptr){};
-    const_iterator(const rcu_list<T, M, Alloc>::iterator & it) : m_current(it.m_current){};
+    const_iterator(const rcu_list<T, M, Alloc>::iterator &it) : m_current(it.m_current){};
 
-    const T & operator*() const
+    const T &operator*() const
     {
         return m_current->data;
     };
-    const T * operator->() const
+    const T *operator->() const
     {
         return &(m_current->data);
     };
 
-    bool operator==(const const_iterator & other) const
+    bool operator==(const const_iterator &other) const
     {
         return m_current == other.m_current;
     }
 
-    bool operator!=(const const_iterator & other) const
+    bool operator!=(const const_iterator &other) const
     {
         return m_current != other.m_current;
     }
 
-    const_iterator & operator++()
+    const_iterator &operator++()
     {
-        m_current = m_current->next;
+        m_current = m_current->next.load();
         return *this;
     }
 
-    const_iterator & operator--()
+    const_iterator &operator--()
     {
-        m_current = m_current->prev;
+        m_current = m_current->prev.load();
         return *this;
     }
 
@@ -353,9 +351,9 @@ class rcu_list<T, M, Alloc>::const_iterator
   private:
     friend rcu_list<T, M, Alloc>;
 
-    explicit const_iterator(node * n) : m_current(n){};
+    explicit const_iterator(node *n) : m_current(n){};
 
-    node * m_current;
+    node *m_current;
 };
 
 /*----------------------------------------*/
@@ -370,13 +368,23 @@ rcu_list<T, M, Alloc>::rcu_list()
 template <typename T, typename M, typename Alloc>
 rcu_list<T, M, Alloc>::~rcu_list()
 {
-    node * n = m_head.load();
+    node *n = m_head.load();
 
     while (n != nullptr) {
-        node * current = n;
-        n = n->next.load();
-        node_alloc_trait::destroy(m_alloc, current);
-        node_alloc_trait::deallocate(m_alloc, current, 1);
+        node *current = n;
+        n             = n->next.load();
+
+        delete current;
+    }
+
+    zombie_list_node *zn = m_zombie_head.load();
+
+    while (zn != nullptr) {
+        zombie_list_node *current = zn;
+        zn                        = zn->next.load();
+
+        delete current->zombie_node;
+        delete current;
     }
 }
 
@@ -410,7 +418,7 @@ void rcu_list<T, M, Alloc>::push_front(T data)
     std::lock_guard<M> guard(m_write_mutex);
     std::unique_ptr<node> newNode(new node(std::move(data)));
 
-    node * oldHead = m_head.load(std::memory_order_relaxed);
+    node *oldHead = m_head.load();
 
     if (oldHead == nullptr) {
         m_head.store(newNode.get());
@@ -429,14 +437,14 @@ void rcu_list<T, M, Alloc>::emplace_front(Us &&... vs)
     std::lock_guard<M> guard(m_write_mutex);
     std::unique_ptr<node> newNode(new node(std::forward<Us>(vs)...));
 
-    node * oldHead = m_tail.load(std::memory_order_relaxed);
+    node *oldHead = m_head.load();
 
     if (oldHead == nullptr) {
         m_head.store(newNode.get());
         m_tail.store(newNode.release());
     } else {
-        newNode->back.store(oldHead);
-        oldHead->next.store(newNode.get());
+        newNode->next.store(oldHead);
+        oldHead->back.store(newNode.get());
         m_head.store(newNode.release());
     }
 }
@@ -447,7 +455,7 @@ void rcu_list<T, M, Alloc>::push_back(T data)
     std::lock_guard<M> guard(m_write_mutex);
     std::unique_ptr<node> newNode(new node(std::move(data)));
 
-    node * oldTail = m_tail.load(std::memory_order_relaxed);
+    node *oldTail = m_tail.load(std::memory_order_relaxed);
 
     if (oldTail == nullptr) {
         m_head.store(newNode.get());
@@ -466,7 +474,7 @@ void rcu_list<T, M, Alloc>::emplace_back(Us &&... vs)
     std::lock_guard<M> guard(m_write_mutex);
     std::unique_ptr<node> newNode(new node(std::forward<Us>(vs)...));
 
-    node * oldTail = m_tail.load(std::memory_order_relaxed);
+    node *oldTail = m_tail.load(std::memory_order_relaxed);
 
     if (oldTail == nullptr) {
         m_head.store(newNode.get());
@@ -481,39 +489,41 @@ void rcu_list<T, M, Alloc>::emplace_back(Us &&... vs)
 template <typename T, typename M, typename Alloc>
 auto rcu_list<T, M, Alloc>::erase(const_iterator iter) -> iterator
 {
-
-    // Make sure the node has not already been marked for deletion
+    std::lock_guard<M> guard(m_write_mutex);
+    // make sure the node has not already been marked for deletion
+    node *oldNext = iter.m_current->next.load();
     if (!iter.m_current->deleted) {
         iter.m_current->deleted = true;
 
-        std::shared_ptr<zombie_list_node> newZombie = std::make_shared<zombie_list_node>();
-        newZombie->zombie_node                      = iter.m_current;
-
-        std::shared_ptr<zombie_list_node> oldZombie = atomic_load(&m_zombie_head);
-
-        do {
-            newZombie->next = oldZombie;
-        } while (!atomic_compare_exchange_weak(&m_zombie_head, &oldZombie, newZombie));
-
-        node * oldPrev = iter.m_current->back.load();
-        node * oldNext = iter.m_current->next.load();
+        node *oldPrev = iter.m_current->back.load();
+        node *oldNext = iter.m_current->next.load();
 
         if (oldPrev) {
             oldPrev->next.store(oldNext);
         } else {
-            // no previous node, we must have been the head
+            // no previous node, this node was the head
             m_head.store(oldNext);
         }
 
         if (oldNext) {
             oldNext->back.store(oldPrev);
         } else {
-            // no next node, we must have been the tail
+            // no next node, this node was the tail
             m_tail.store(oldPrev);
         }
+
+        std::unique_ptr<zombie_list_node> newZombie(new zombie_list_node(iter.m_current));
+
+        zombie_list_node *oldZombie = m_zombie_head.load();
+
+        do {
+            newZombie->next = oldZombie;
+        } while (!m_zombie_head.compare_exchange_weak(oldZombie, newZombie.get()));
+
+        newZombie.release();
     }
 
-    return iterator(++iter);
+    return iterator(oldNext);
 }
 }
 
