@@ -39,7 +39,6 @@ namespace libguarded
  The handle returned by the various lock methods is moveable but not
  copyable.
 */
-
 template <typename T, typename M = std::shared_timed_mutex>
 class ordered_guarded
 {

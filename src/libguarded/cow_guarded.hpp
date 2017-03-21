@@ -22,6 +22,21 @@
 namespace libguarded
 {
 
+/**
+ This templated class wraps an object and allows only one thread at a
+ time to modify the protected object. Any number of threads can read
+ the protected object simultaneously and the version as of the time of
+ reading will be maintained until no longer needed.
+
+ This class will use std::mutex for the internal locking mechanism by
+ default. Other classes which are useful for the mutex type are
+ std::recursive_mutex, std::timed_mutex, and
+ std::recursive_timed_mutex.
+
+ The handle returned by the various lock methods is moveable but not
+ copyable. The shared_handle type is moveable and copyable.
+
+*/
 template <typename T, typename Mutex = std::mutex>
 class cow_guarded
 {

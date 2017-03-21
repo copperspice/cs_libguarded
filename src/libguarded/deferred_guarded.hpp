@@ -35,6 +35,16 @@ namespace libguarded
 template <class T>
 typename std::add_lvalue_reference<T>::type declref();
 
+/**
+ This templated class wraps an object and allows only one thread at a
+ time to modify the protected object.
+
+ This class will use std::shared_timed_mutex for the internal locking mechanism by
+ default. In C++17, the class std::shared_mutex is available as well.
+
+ The shared_handle returned by the various lock methods is moveable
+ but not copyable.
+*/
 template <typename T, typename M = std::shared_timed_mutex>
 class deferred_guarded
 {

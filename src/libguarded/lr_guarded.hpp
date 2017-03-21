@@ -21,6 +21,18 @@
 namespace libguarded
 {
 
+/**
+ This templated class wraps an object and allows only one thread at a
+ time to modify the protected object.
+
+ This class will use std::mutex for the internal locking mechanism by
+ default. Other classes which are useful for the mutex type are
+ std::recursive_mutex, std::timed_mutex, and
+ std::recursive_timed_mutex.
+
+ The handle returned by the various lock methods is moveable and
+ copyable.
+*/
 template <typename T, typename Mutex = std::mutex>
 class lr_guarded
 {

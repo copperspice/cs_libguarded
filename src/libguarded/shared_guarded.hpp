@@ -25,6 +25,17 @@ class shared_timed_mutex;
 namespace libguarded
 {
 
+/**
+ This templated class wraps an object and allows only one thread at a
+ time to modify the protected object.
+
+ This class will use std::shared_timed_mutex for the internal locking
+ mechanism by default. In C++17 the std::shared_mutex class is also
+ available.
+
+ The handle returned by the various lock methods is moveable but not
+ copyable.
+*/
 template <typename T, typename M = std::shared_timed_mutex>
 class shared_guarded
 {
