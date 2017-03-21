@@ -30,6 +30,7 @@ class rcu_list
     using const_reference = const value_type &;
     using pointer         = typename std::allocator_traits<Alloc>::pointer;
     using const_pointer   = typename std::allocator_traits<Alloc>::const_pointer;
+
     class iterator;
     class const_iterator;
     class reverse_iterator;
@@ -525,6 +526,11 @@ auto rcu_list<T, M, Alloc>::erase(const_iterator iter) -> iterator
 
     return iterator(oldNext);
 }
+
+template <typename T>
+using SharedList = rcu_guarded<rcu_list<T>>;
 }
+
+namespace LibG = libguarded;
 
 #endif
