@@ -17,6 +17,8 @@
 #include <memory>
 #include <mutex>
 
+#include <libguarded/rcu_guarded.hpp>
+
 namespace libguarded
 {
 template <typename T, typename M = std::mutex, typename Alloc = std::allocator<T>>
