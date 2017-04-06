@@ -158,6 +158,10 @@ class cow_guarded
         void cancel()
         {
             m_cancelled = true;
+
+            if (m_lock.owns_lock()) {
+                m_lock.unlock();
+            }
         }
 
         void operator()(T * ptr)
