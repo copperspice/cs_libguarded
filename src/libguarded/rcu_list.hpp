@@ -193,7 +193,7 @@ void rcu_list<T, M, Alloc>::rcu_guard::rcu_read_lock(const rcu_list<T, M, Alloc>
 }
 
 template <typename T, typename M, typename Alloc>
-void rcu_list<T, M, Alloc>::rcu_guard::rcu_read_unlock(const rcu_list<T, M, Alloc> &list)
+void rcu_list<T, M, Alloc>::rcu_guard::rcu_read_unlock(const rcu_list<T, M, Alloc> &)
 {
     unlock();
 };
@@ -204,17 +204,28 @@ void rcu_list<T, M, Alloc>::rcu_guard::unlock()
     zombie_list_node *n = m_list->m_zombie_head.load();
     n                   = m_zombie->next.load();
 
+    bool last = true;
+
     while (n) {
         if (n->owner.load() != nullptr) {
+            last = false;
             break;
         }
 
-        node *deadNode = n->zombie_node;
-        delete deadNode;
+        n = n->next.load();
+    }
 
-        zombie_list_node *oldnode = n;
-        n                         = n->next.load();
-        delete oldnode;
+    n = m_zombie->next.load();
+
+    if (last) {
+        while (n) {
+            node *deadNode = n->zombie_node;
+            delete deadNode;
+
+            zombie_list_node *oldnode = n;
+            n                         = n->next.load();
+            delete oldnode;
+        }
     }
 
     m_zombie->next.store(n);
@@ -401,7 +412,7 @@ rcu_list<T, M, Alloc>::~rcu_list()
 
     zombie_list_node *zn = m_zombie_head.load();
 
-    while (zn != nullptr) {
+    while (zn != nullptr && zn->owner.load() == nullptr) {
         zombie_list_node *current = zn;
         zn                        = zn->next.load();
 

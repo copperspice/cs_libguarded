@@ -150,7 +150,7 @@ auto rcu_guarded<T>::lock_read() const -> read_handle
 }
 
 template <typename T>
-rcu_guarded<T>::write_handle(T *ptr)
+rcu_guarded<T>::write_handle::write_handle(T *ptr)
     : m_ptr(ptr), m_accessed(false)
 {
 }
