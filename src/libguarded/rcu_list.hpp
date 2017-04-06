@@ -21,6 +21,26 @@
 
 namespace libguarded
 {
+
+/**
+   \headerfile rcu_list.hpp <libguarded/rcu_list.hpp>
+
+   This templated class implements a linked list which is maintained
+   using the RCU algorithm. Only one thread at a time may modify the
+   linked list, but any number of threads may read
+   simultaneously. Ongoing writes will not block readers. As a reader
+   traverses the list while mutating operations are ongoing, the
+   reader may see the old state or the new state.
+
+   Since the RCU algorithm does not reap nodes until all readers who
+   could have seen the node have completed, iterators are never
+   invalidated by any list operation.
+
+   This class will use std::mutex for the internal locking mechanism
+   by default. Other classes which are useful for the mutex type are
+   std::recursive_mutex, std::timed_mutex, and
+   std::recursive_timed_mutex.
+*/
 template <typename T, typename M = std::mutex, typename Alloc = std::allocator<T>>
 class rcu_list
 {

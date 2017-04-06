@@ -23,10 +23,21 @@ namespace libguarded
 {
 
 /**
+ \headerfile cow_guarded.hpp <libguarded/cow_guarded.hpp>
+
  This templated class wraps an object and allows only one thread at a
  time to modify the protected object. Any number of threads can read
  the protected object simultaneously and the version as of the time of
  reading will be maintained until no longer needed.
+
+ When a thread locks the cow_guarded object for writing, a copy is
+ made so that the writer may modify the stored data without race
+ conditions. When the handle is released, the old copy is atomically
+ replaced by the modified copy.
+
+ The handle type supports a cancel() method, which will discard the
+ modified copy and immediately unlock the data without applying the
+ changes.
 
  This class will use std::mutex for the internal locking mechanism by
  default. Other classes which are useful for the mutex type are
@@ -36,6 +47,7 @@ namespace libguarded
  The handle returned by the various lock methods is moveable but not
  copyable. The shared_handle type is moveable and copyable.
 
+ The T class must be copy constructible.
 */
 template <typename T, typename Mutex = std::mutex>
 class cow_guarded
@@ -48,26 +60,87 @@ class cow_guarded
     class handle;
     using shared_handle = std::shared_ptr<const T>;
 
+    /**
+     Construct a cow_guarded object. This constructor will accept any
+     number of parameters, all of which are forwarded to the
+     constructor of T.
+    */
     template <typename... Us>
     cow_guarded(Us &&... data);
 
-    // exclusive access
+    /**
+     Acquire a handle to the protected object. As a side effect, the
+     protected object will be locked from access by any other
+     thread. The lock will be automatically released when the handle
+     is destroyed.
+    */
     handle lock();
+
+    /**
+     Attempt to acquire a handle to the protected object. Returns a
+     null handle if the object is already locked. As a side effect,
+     the protected object will be locked from access by any other
+     thread. The lock will be automatically released when the handle
+     is destroyed.
+    */
     handle try_lock();
 
+    /**
+     Attempt to acquire a handle to the protected object. As a side
+     effect, the protected object will be locked from access by any
+     other thread. The lock will be automatically released when the
+     handle is destroyed.
+
+     Returns a null handle if the object is already locked, and does
+     not become available for locking before the time duration has
+     elapsed.
+
+     Calling this method requires that the underlying mutex type M
+     supports the try_lock_for method.  This is not true if M is the
+     default std::mutex.
+    */
     template <class Duration>
     handle try_lock_for(const Duration & duration);
 
+    /**
+     Attempt to acquire a handle to the protected object.  As a side
+     effect, the protected object will be locked from access by any other
+     thread. The lock will be automatically released when the handle is
+     destroyed.
+
+     Returns a null handle if the object is already locked, and does not
+     become available for locking before reaching the specified timepoint.
+
+     Calling this method requires that the underlying mutex type M
+     supports the try_lock_until method.  This is not true if M is the
+     default std::mutex.
+    */
     template <class TimePoint>
     handle try_lock_until(const TimePoint & timepoint);
 
-    // shared access, note "shared" in method names
+    /**
+     Acquire a shared_handle to the protected object. Always succeeds without
+     blocking.
+    */
     shared_handle lock_shared() const;
+
+    /**
+     Acquire a shared_handle to the protected object. Always succeeds without
+     blocking.
+    */
     shared_handle try_lock_shared() const;
 
+    /**
+     Acquire a shared_handle to the protected object. Always succeeds without
+     blocking.
+    */
     template <class Duration>
     shared_handle try_lock_shared_for(const Duration & duration) const;
 
+    /**
+     Acquire a shared_handle to the protected object. Always succeeds without
+     blocking.
+    */
     template <class TimePoint>
     shared_handle try_lock_shared_until(const TimePoint & timepoint) const;
 
@@ -109,11 +182,18 @@ class cow_guarded
     };
 
   public:
+    /**
+       The handle class for cow_guarded is moveable but not copyable.
+     */
     class handle : public std::unique_ptr<T, deleter>
     {
       public:
         using std::unique_ptr<T, deleter>::unique_ptr;
 
+        /**
+           Cancel all pending changes, reset the handle to null, and
+           unlock the data.
+         */
         void cancel()
         {
             this->get_deleter().cancel();

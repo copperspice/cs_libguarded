@@ -20,16 +20,18 @@ namespace libguarded
 {
 
 /**
- This templated class wraps an object and allows only one thread at a
- time to access the protected object.
+   \headerfile guarded.hpp <libguarded/guarded.hpp>
 
- This class will use std::mutex for the internal locking mechanism by
- default. Other classes which are useful for the mutex type are
- std::recursive_mutex, std::timed_mutex, and
- std::recursive_timed_mutex.
+   This templated class wraps an object and allows only one thread at a
+   time to access the protected object.
 
- The handle returned by the various lock methods is moveable but not
- copyable.
+   This class will use std::mutex for the internal locking mechanism by
+   default. Other classes which are useful for the mutex type are
+   std::recursive_mutex, std::timed_mutex, and
+   std::recursive_timed_mutex.
+
+   The handle returned by the various lock methods is moveable but not
+   copyable.
 */
 template <typename T, typename M = std::mutex>
 class guarded
@@ -41,16 +43,18 @@ class guarded
     using handle = std::unique_ptr<T, deleter>;
 
     /**
-     Construct a guarded object. This constructor will accept any number
-     of parameters, all of which are forwarded to the constructor of T.
+     Construct a guarded object. This constructor will accept any
+     number of parameters, all of which are forwarded to the
+     constructor of T.
     */
     template <typename... Us>
     guarded(Us &&... data);
 
     /**
      Acquire a handle to the protected object. As a side effect, the
-     protected object will be locked from access by any other thread. The
-     lock will be automatically released when the handle is destroyed.
+     protected object will be locked from access by any other
+     thread. The lock will be automatically released when the handle
+     is destroyed.
     */
     handle lock();
 

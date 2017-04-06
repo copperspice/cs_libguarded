@@ -29,15 +29,18 @@ namespace libguarded
 {
 
 /**
- This templated class wraps an object. The protected object may be
- read by any number of threads simultaneously, but only one thread may
- modify the object at a time.
+   \headerfile ordered_guarded.hpp <libguarded/ordered_guarded.hpp>
 
- This class will use std::shared_timed_mutex for the internal locking mechanism by
- default. In C++17, the class std::shared_mutex is available as well.
+   This templated class wraps an object. The protected object may be
+   read by any number of threads simultaneously, but only one thread
+   may modify the object at a time.
 
- The handle returned by the various lock methods is moveable but not
- copyable.
+   This class will use std::shared_timed_mutex for the internal
+   locking mechanism by default. In C++17, the class std::shared_mutex
+   is available as well.
+
+   The handle returned by the various lock methods is moveable but not
+   copyable.
 */
 template <typename T, typename M = std::shared_timed_mutex>
 class ordered_guarded

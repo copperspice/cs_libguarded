@@ -22,16 +22,25 @@ namespace libguarded
 {
 
 /**
- This templated class wraps an object and allows only one thread at a
- time to modify the protected object.
+   \headerfile lr_guarded.hpp <libguarded/lr_guarded.hpp>
 
- This class will use std::mutex for the internal locking mechanism by
- default. Other classes which are useful for the mutex type are
- std::recursive_mutex, std::timed_mutex, and
- std::recursive_timed_mutex.
+   This templated class wraps an object and allows only one thread at
+   a time to modify the protected object.
 
- The handle returned by the various lock methods is moveable and
- copyable.
+   This class will use std::mutex for the internal locking mechanism
+   by default. Other classes which are useful for the mutex type are
+   std::recursive_mutex, std::timed_mutex, and
+   std::recursive_timed_mutex.
+
+   The handle returned by the various lock methods is moveable and
+   copyable.
+
+   Internally this class operates by maintaining two copies of the
+   data and applying the same modifications to each copy in
+   turn. Therefore the lr_guarded object will consume twice as much
+   memory as one T plus a small amount of overhead.
+
+ The T class must be copy constructible and copy assignable.
 */
 template <typename T, typename Mutex = std::mutex>
 class lr_guarded
@@ -42,19 +51,53 @@ class lr_guarded
   public:
     using shared_handle = std::unique_ptr<const T, shared_deleter>;
 
+    /**
+     Construct an lr_guarded object. This constructor will accept any
+     number of parameters, all of which are forwarded to the
+     constructor of T.
+    */
     template <typename... Us>
     lr_guarded(Us &&... data);
 
+    /**
+     Modify the data by passing a functor. The functor must take
+     exactly one argument of type T&. The functor will be called
+     twice, once for each copy of the data. It must make the same
+     modification for both invocations.
+
+     If the first invocation of the functor throws an exception, the
+     modification will be rolled back by copying from the unchanged
+     copy. If the second invocation throws, the modification will be
+     completed by copying from the changed copy. In either case if the
+     copy constructor throws, the data is left in an indeterminate
+     state.
+    */
     template <typename Func>
     void modify(Func && f);
 
-    // shared access
+    /**
+     Acquire a shared_handle to the protected object. Always succeeds without
+     blocking.
+    */
     shared_handle lock_shared() const;
+
+    /**
+     Acquire a shared_handle to the protected object. Always succeeds without
+     blocking.
+    */
     shared_handle try_lock_shared() const;
 
+    /**
+     Acquire a shared_handle to the protected object. Always succeeds without
+     blocking.
+    */
     template <class Duration>
     shared_handle try_lock_shared_for(const Duration & duration) const;
 
+    /**
+     Acquire a shared_handle to the protected object. Always succeeds without
+     blocking.
+    */
     template <class TimePoint>
     shared_handle try_lock_shared_until(const TimePoint & timepoint) const;
 
