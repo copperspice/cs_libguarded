@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(rcu_guarded_1)
         auto h = my_list.lock_read();
 
         int count = 0;
-        for (auto & item : *h) {
+        for (auto &item : *h) {
             ++count;
             BOOST_CHECK_EQUAL(item, 42);
         }
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(rcu_guarded_1)
 
         int count = 0;
         volatile int escape;
-        for (auto & item : *h) {
+        for (auto &item : *h) {
             escape = item;
             ++count;
         }
@@ -58,14 +58,14 @@ BOOST_AUTO_TEST_CASE(rcu_guarded_1)
     }
 
     {
-	constexpr const int num_writers = 8;
-	std::atomic<int> t_writers_done{0};
+        constexpr const int num_writers = 8;
+        std::atomic<int> t_writers_done{0};
 
         std::vector<std::thread> threads;
         for (int i = 0; i < num_writers; ++i) {
             threads.emplace_back([&]() {
                 while (!t_writers_done.load()) {
-                    auto rh = my_list.lock_read();
+                    auto rh = my_list.lock_write();
                     volatile int escape;
                     for (auto item : *rh) {
                         escape = item;
@@ -109,10 +109,7 @@ BOOST_AUTO_TEST_CASE(rcu_guarded_1)
             }
         });
 
-        while (!t_writers_done.load()) {
-        }
-
-        for (auto & thread : threads) {
+        for (auto &thread : threads) {
             thread.join();
         }
     }
@@ -122,7 +119,7 @@ BOOST_AUTO_TEST_CASE(rcu_guarded_1)
 
         int count = 0;
         volatile int escape;
-        for (auto & item : *h) {
+        for (auto &item : *h) {
             escape = item;
             ++count;
         }

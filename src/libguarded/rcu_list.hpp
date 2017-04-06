@@ -66,7 +66,7 @@ class rcu_list
     explicit rcu_list(const Alloc &alloc);
 
     rcu_list(const rcu_list &) = delete;
-    rcu_list(rcu_list &&) = delete;
+    rcu_list(rcu_list &&)      = delete;
     rcu_list &operator=(const rcu_list &) = delete;
     rcu_list &operator=(rcu_list &&) = delete;
 
@@ -106,13 +106,12 @@ class rcu_list
     struct node {
         // uncopyable, unmoveable
         node(const node &) = delete;
-        node(node &&) = delete;
+        node(node &&)      = delete;
         node &operator=(const node &) = delete;
         node &operator=(node &&) = delete;
 
         template <typename... Us>
-        explicit node(Us &&... vs)
-            : data(std::forward<Us>(vs)...)
+        explicit node(Us &&... vs) : data(std::forward<Us>(vs)...)
         {
         }
 
@@ -133,7 +132,7 @@ class rcu_list
 
         // uncopyable, unmoveable
         zombie_list_node(const zombie_list_node &) = delete;
-        zombie_list_node(zombie_list_node &&) = delete;
+        zombie_list_node(zombie_list_node &&)      = delete;
         zombie_list_node &operator=(const zombie_list_node &) = delete;
         zombie_list_node &operator=(zombie_list_node &&) = delete;
 

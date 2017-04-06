@@ -48,24 +48,22 @@ class rcu_guarded
         using pointer      = T *;
         using element_type = T;
 
-        write_handle(T * ptr) : m_ptr(ptr), m_accessed(false)
-        {
-        }
+        write_handle(T *ptr);
 
         ~write_handle()
         {
             if (m_accessed) {
                 m_guard.rcu_write_unlock(*m_ptr);
             }
-        };
+        }
 
-        T & operator*() const
+        T &operator*() const
         {
             access();
             return *m_ptr;
         }
 
-        T * operator->() const
+        T *operator->() const
         {
             access();
             return m_ptr;
@@ -80,7 +78,7 @@ class rcu_guarded
             }
         }
 
-        T * m_ptr;
+        T *m_ptr;
         mutable typename T::rcu_write_guard m_guard;
         mutable bool m_accessed;
     };
@@ -91,7 +89,7 @@ class rcu_guarded
         using pointer      = const T *;
         using element_type = const T;
 
-        read_handle(const T * ptr) : m_ptr(ptr), m_accessed(false)
+        read_handle(const T *ptr) : m_ptr(ptr), m_accessed(false)
         {
         }
 
@@ -100,15 +98,15 @@ class rcu_guarded
             if (m_accessed) {
                 m_guard.rcu_read_unlock(*m_ptr);
             }
-        };
+        }
 
-        const T & operator*() const
+        const T &operator*() const
         {
             access();
             return *m_ptr;
         }
 
-        const T * operator->() const
+        const T *operator->() const
         {
             access();
             return m_ptr;
@@ -123,7 +121,7 @@ class rcu_guarded
             }
         }
 
-        const T * m_ptr;
+        const T *m_ptr;
         mutable typename T::rcu_read_guard m_guard;
         mutable bool m_accessed;
     };
@@ -149,6 +147,12 @@ template <typename T>
 auto rcu_guarded<T>::lock_read() const -> read_handle
 {
     return read_handle(&m_obj);
+}
+
+template <typename T>
+rcu_guarded<T>::write_handle(T *ptr)
+    : m_ptr(ptr), m_accessed(false)
+{
 }
 }
 

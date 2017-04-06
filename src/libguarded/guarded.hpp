@@ -82,7 +82,7 @@ class guarded
      default std::mutex.
     */
     template <class Duration>
-    handle try_lock_for(const Duration & duration);
+    handle try_lock_for(const Duration &duration);
 
     /**
      Attempt to acquire a handle to the protected object.  As a side
@@ -98,7 +98,7 @@ class guarded
      default std::mutex.
     */
     template <class TimePoint>
-    handle try_lock_until(const TimePoint & timepoint);
+    handle try_lock_until(const TimePoint &timepoint);
 
   private:
     class deleter
@@ -110,7 +110,7 @@ class guarded
         {
         }
 
-        void operator()(T * ptr)
+        void operator()(T *ptr)
         {
             if (m_lock.owns_lock()) {
                 m_lock.unlock();
@@ -127,8 +127,7 @@ class guarded
 
 template <typename T, typename M>
 template <typename... Us>
-guarded<T, M>::guarded(Us &&... data)
-    : m_obj(std::forward<Us>(data)...)
+guarded<T, M>::guarded(Us &&... data) : m_obj(std::forward<Us>(data)...)
 {
 }
 
@@ -153,7 +152,7 @@ auto guarded<T, M>::try_lock() -> handle
 
 template <typename T, typename M>
 template <typename Duration>
-auto guarded<T, M>::try_lock_for(const Duration & d) -> handle
+auto guarded<T, M>::try_lock_for(const Duration &d) -> handle
 {
     std::unique_lock<M> lock(m_mutex, d);
 
@@ -166,7 +165,7 @@ auto guarded<T, M>::try_lock_for(const Duration & d) -> handle
 
 template <typename T, typename M>
 template <typename TimePoint>
-auto guarded<T, M>::try_lock_until(const TimePoint & tp) -> handle
+auto guarded<T, M>::try_lock_until(const TimePoint &tp) -> handle
 {
     std::unique_lock<M> lock(m_mutex, tp);
 

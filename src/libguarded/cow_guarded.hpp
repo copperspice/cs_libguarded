@@ -100,7 +100,7 @@ class cow_guarded
      default std::mutex.
     */
     template <class Duration>
-    handle try_lock_for(const Duration & duration);
+    handle try_lock_for(const Duration &duration);
 
     /**
      Attempt to acquire a handle to the protected object.  As a side
@@ -116,7 +116,7 @@ class cow_guarded
      default std::mutex.
     */
     template <class TimePoint>
-    handle try_lock_until(const TimePoint & timepoint);
+    handle try_lock_until(const TimePoint &timepoint);
 
     /**
      Acquire a shared_handle to the protected object. Always succeeds without
@@ -135,14 +135,14 @@ class cow_guarded
      blocking.
     */
     template <class Duration>
-    shared_handle try_lock_shared_for(const Duration & duration) const;
+    shared_handle try_lock_shared_for(const Duration &duration) const;
 
     /**
      Acquire a shared_handle to the protected object. Always succeeds without
      blocking.
     */
     template <class TimePoint>
-    shared_handle try_lock_shared_until(const TimePoint & timepoint) const;
+    shared_handle try_lock_shared_until(const TimePoint &timepoint) const;
 
   private:
     class deleter
@@ -150,7 +150,7 @@ class cow_guarded
       public:
         using pointer = T *;
 
-        deleter(std::unique_lock<Mutex> && lock, cow_guarded & guarded)
+        deleter(std::unique_lock<Mutex> &&lock, cow_guarded &guarded)
             : m_lock(std::move(lock)), m_guarded(guarded), m_cancelled(false)
         {
         }
@@ -164,14 +164,14 @@ class cow_guarded
             }
         }
 
-        void operator()(T * ptr)
+        void operator()(T *ptr)
         {
             if (m_cancelled) {
                 delete ptr;
             } else if (ptr) {
                 std::shared_ptr<const T> newPtr(ptr);
 
-                m_guarded.m_data.modify([newPtr](std::shared_ptr<const T> & ptr) { ptr = newPtr; });
+                m_guarded.m_data.modify([newPtr](std::shared_ptr<const T> &ptr) { ptr = newPtr; });
             }
 
             if (m_lock.owns_lock()) {
@@ -181,8 +181,8 @@ class cow_guarded
 
       private:
         std::unique_lock<Mutex> m_lock;
-        cow_guarded &           m_guarded;
-        bool                    m_cancelled;
+        cow_guarded &m_guarded;
+        bool m_cancelled;
     };
 
   public:
@@ -207,7 +207,7 @@ class cow_guarded
 
   private:
     mutable lr_guarded<std::shared_ptr<const T>> m_data;
-    mutable Mutex                                m_writeMutex;
+    mutable Mutex m_writeMutex;
 };
 
 template <typename T, typename M>
@@ -222,7 +222,7 @@ auto cow_guarded<T, M>::lock() -> handle
 {
     std::unique_lock<M> guard(m_writeMutex);
 
-    auto               data(m_data.lock_shared());
+    auto data(m_data.lock_shared());
     std::unique_ptr<T> val(new T(**data));
     data.reset();
 
@@ -248,10 +248,10 @@ auto cow_guarded<T, M>::try_lock() -> handle
 
 template <typename T, typename M>
 template <typename Duration>
-auto cow_guarded<T, M>::try_lock_for(const Duration & duration) -> handle
+auto cow_guarded<T, M>::try_lock_for(const Duration &duration) -> handle
 {
     std::unique_lock<M> guard(m_writeMutex);
-    auto                data = m_data.try_lock_shared_for(duration);
+    auto data = m_data.try_lock_shared_for(duration);
 
     if (!data) {
         return handle();
@@ -265,7 +265,7 @@ auto cow_guarded<T, M>::try_lock_for(const Duration & duration) -> handle
 
 template <typename T, typename M>
 template <typename TimePoint>
-auto cow_guarded<T, M>::try_lock_until(const TimePoint & timepoint) -> handle
+auto cow_guarded<T, M>::try_lock_until(const TimePoint &timepoint) -> handle
 {
     std::unique_lock<M> guard(m_writeMutex);
 
@@ -303,7 +303,7 @@ auto cow_guarded<T, M>::try_lock_shared() const -> shared_handle
 
 template <typename T, typename M>
 template <typename Duration>
-auto cow_guarded<T, M>::try_lock_shared_for(const Duration & duration) const -> shared_handle
+auto cow_guarded<T, M>::try_lock_shared_for(const Duration &duration) const -> shared_handle
 {
     shared_handle retval;
 
@@ -317,7 +317,7 @@ auto cow_guarded<T, M>::try_lock_shared_for(const Duration & duration) const -> 
 
 template <typename T, typename M>
 template <typename TimePoint>
-auto cow_guarded<T, M>::try_lock_shared_until(const TimePoint & timepoint) const -> shared_handle
+auto cow_guarded<T, M>::try_lock_shared_until(const TimePoint &timepoint) const -> shared_handle
 {
     shared_handle retval;
 
