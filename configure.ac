@@ -1,4 +1,4 @@
-AC_INIT(libguarded, 1.0.0)
+AC_INIT(libguarded, 1.1.0)
 
 AC_CONFIG_AUX_DIR(autotools/build-aux)
 AC_CONFIG_MACRO_DIR([autotools/m4])
