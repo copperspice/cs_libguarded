@@ -201,8 +201,7 @@ void rcu_list<T, M, Alloc>::rcu_guard::rcu_read_unlock(const rcu_list<T, M, Allo
 template <typename T, typename M, typename Alloc>
 void rcu_list<T, M, Alloc>::rcu_guard::unlock()
 {
-    zombie_list_node *n = m_list->m_zombie_head.load();
-    n                   = m_zombie->next.load();
+    zombie_list_node *n = m_zombie->next.load();
 
     bool last = true;
 
