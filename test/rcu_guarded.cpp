@@ -126,3 +126,72 @@ BOOST_AUTO_TEST_CASE(rcu_guarded_1)
         BOOST_CHECK_EQUAL(count, 0);
     }
 }
+
+// allocation events recorded by mock_allocator
+struct event {
+    size_t size;
+    bool allocated; // true for allocate(), false for deallocate()
+};
+using event_log = std::vector<event>;
+
+template <typename T>
+class mock_allocator {
+    event_log *const log;
+
+  public:
+    using value_type = T;
+
+    explicit mock_allocator(event_log *log) : log(log) {}
+    mock_allocator(const mock_allocator& other) : log(other.log) {}
+
+    // converting copy constructor (requires friend)
+    template <typename> friend class mock_allocator;
+    template <typename U>
+    mock_allocator(const mock_allocator<U>& other) : log(other.log) {}
+
+    T* allocate(size_t n, const void* hint=0)
+    {
+        auto p = std::allocator<T>{}.allocate(n, hint);
+        log->emplace_back(event{n * sizeof(T), true});
+        return p;
+    }
+    void deallocate(T* p, size_t n)
+    {
+        std::allocator<T>{}.deallocate(p, n);
+        if (p) {
+            log->emplace_back(event{n * sizeof(T), false});
+        }
+    }
+};
+
+BOOST_AUTO_TEST_CASE(rcu_guarded_allocator)
+{
+    // large value type makes it easy to distinguish nodes from zombies
+    // (this avoids any dependency on the private rcu_list node types)
+    constexpr size_t value_size = 256;
+    auto is_zombie = [=] (const event& e) { return e.size < value_size; };
+    auto is_alloc = [] (const event& e) { return e.allocated; };
+
+    using T = std::aligned_storage<value_size>::type;
+
+    event_log log;
+    {
+        mock_allocator<T> alloc{&log};
+        rcu_guarded<rcu_list<T, std::mutex, mock_allocator<T>>> my_list(alloc);
+
+        auto h = my_list.lock_write(); // allocates zombie
+        h->emplace_back(); // allocates node
+        h->erase(h->begin()); // allocates zombie
+
+        // expect 3 allocations, two of which are zombies. just count events,
+        // don't make assumptions about ordering
+        BOOST_CHECK_EQUAL(3, log.size());
+        BOOST_CHECK_EQUAL(3, std::count_if(log.begin(), log.end(), is_alloc));
+        BOOST_CHECK_EQUAL(2, std::count_if(log.begin(), log.end(), is_zombie));
+    }
+
+    // expects 3 new deallocations, two of which are zombies
+    BOOST_CHECK_EQUAL(6, log.size());
+    BOOST_CHECK_EQUAL(3, std::count_if(log.begin(), log.end(), is_alloc));
+    BOOST_CHECK_EQUAL(4, std::count_if(log.begin(), log.end(), is_zombie));
+}
