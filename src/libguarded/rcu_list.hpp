@@ -225,9 +225,10 @@ void rcu_list<T, M, Alloc>::rcu_guard::unlock()
             n                         = n->next.load();
             delete oldnode;
         }
+
+        m_zombie->next.store(n);
     }
 
-    m_zombie->next.store(n);
     m_zombie->owner.store(nullptr);
 }
 
