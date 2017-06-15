@@ -245,8 +245,8 @@ void rcu_list<T, M, Alloc>::rcu_guard::rcu_read_unlock(const rcu_list<T, M, Allo
 template <typename T, typename M, typename Alloc>
 void rcu_list<T, M, Alloc>::rcu_guard::unlock()
 {
-    zombie_list_node *n = m_list->m_zombie_head.load();
-    n                   = m_zombie->next.load();
+    zombie_list_node *cached_next = m_zombie->next.load();
+    zombie_list_node *n           = cached_next;
 
     bool last = true;
 
@@ -259,7 +259,7 @@ void rcu_list<T, M, Alloc>::rcu_guard::unlock()
         n = n->next.load();
     }
 
-    n = m_zombie->next.load();
+    n = cached_next;
 
     if (last) {
         while (n) {
@@ -272,9 +272,10 @@ void rcu_list<T, M, Alloc>::rcu_guard::unlock()
             zombie_alloc_trait::destroy(m_list->m_zombie_alloc, oldnode);
             zombie_alloc_trait::deallocate(m_list->m_zombie_alloc, oldnode, 1);
         }
+
+        m_zombie->next.store(n);
     }
 
-    m_zombie->next.store(n);
     m_zombie->owner.store(nullptr);
 }
 
