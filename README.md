@@ -2,14 +2,10 @@
 
 ### Introduction
 
-The libGuarded library is a standalone header-only library for multithreaded programming.
+The libGuarded library is a standalone header-only library to make correct and deadlock free multithreaded programming easier.
 
-This library provides templated classes which prevent race conditions by controlling access
-to shared data. Existing multithreading primitives like mutexes and locks are only bound
-to the protected data by conventions. This makes it very easy to introduce bugs in your code
-by forgetting to use the right locks before accessing a block of data. The idea of this
-library is to tie the data and the locks in a type safe interface that only allows correct usage. 
-
+The basic idea is to put the knowledge of what locking mechanism belongs to what data into the type system.
+Incorrect usage will result in compiler errors instead of runtime errors.
 
 ### System Requirements
 
