@@ -61,6 +61,9 @@ class ordered_guarded
     template <typename Func>
     void modify(Func && func);
 
+    template <typename Func>
+    void read(Func && func) const;
+
     shared_handle lock_shared() const;
     shared_handle try_lock_shared() const;
 
@@ -106,6 +109,15 @@ template <typename Func>
 void ordered_guarded<T, M>::modify(Func && func)
 {
     std::lock_guard<M> lock(m_mutex);
+
+    func(m_obj);
+}
+
+template <typename T, typename M>
+template <typename Func>
+void ordered_guarded<T, M>::read(Func && func) const
+{
+    std::shared_lock<M> lock(m_mutex);
 
     func(m_obj);
 }
