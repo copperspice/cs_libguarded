@@ -8,17 +8,15 @@ This library provides templated classes which prevent race conditions by control
 to shared data. Existing multithreading primitives like mutexes and locks are only bound
 to the protected data by conventions. This makes it very easy to introduce bugs in your code
 by forgetting to use the right locks before accessing a block of data. The idea of this
-library is to tie the data and the locks in a type safe interface that only allows correct usage. 
+library is to tie the data and the locks in a type safe interface that only allows correct usage.
 
 
 ### System Requirements
 
-To use libGuarded you will need a C++11 compiler and a C++11 standard library. Some of 
-the advanced features of libGuarded leverage the C++14 standard or equivalent functionality 
-in Boost.
+To use libGuarded you will need a C++14 compiler and a C++14 standard library.
 
-Currently uses the Autotools build system for building and running the unit test suite. 
-The library has been tested with clang sanitizer and a major code review. 
+Currently uses the Autotools build system for building and running the unit test suite.
+The library has been tested with clang thread sanitizer, multiple code reviews, and production software.
 
 
 ### Documentation
@@ -30,9 +28,10 @@ www.copperspice.com/docs/libguarded/index.html
 
 ### Presentations
 
-For additional information on multithreading refer to my presentations:
+Multiple videos discussing libGuarded and multithreading can be found on the following pages:
 
-www.copperspice.com/presentations.html
+www.copperspice.com/presentations.html <br>
+www.youtube.com/copperspice
 
 
 
@@ -45,7 +44,7 @@ www.copperspice.com/presentations.html
 ### License
 
 This library is released under the BSD 2-clause license. For more information refer to the
-LICENSE file provided with this project. 
+LICENSE file provided with this project.
 
 
 ### References
