@@ -1,6 +1,8 @@
 *.deps
 .dirstamp
 *.o
+*.sdf
+*.opensdf
 Makefile
 Makefile.in
 
@@ -17,3 +19,5 @@ Makefile.in
 /autotools/m4/ltsugar.m4
 /autotools/m4/ltversion.m4
 /autotools/m4/lt~obsolete.m4
+/ci/Debug/
+/ci/packages/

@@ -11,7 +11,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="LibGuarded.cpp" />
+    <ClCompile Include="..\test\guarded.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\libguarded\cow_guarded.hpp" />
+    <ClInclude Include="..\src\libguarded\deferred_guarded.hpp" />
+    <ClInclude Include="..\src\libguarded\guarded.hpp" />
+    <ClInclude Include="..\src\libguarded\lr_guarded.hpp" />
+    <ClInclude Include="..\src\libguarded\ordered_guarded.hpp" />
+    <ClInclude Include="..\src\libguarded\rcu_guarded.hpp" />
+    <ClInclude Include="..\src\libguarded\rcu_list.hpp" />
+    <ClInclude Include="..\src\libguarded\shared_guarded.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{30FBF864-C792-4906-AFA6-7935AD4F831E}</ProjectGuid>
@@ -41,7 +54,9 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label="UserMacros">
+    <NuGetPackageImportStamp>92e9a02e</NuGetPackageImportStamp>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
@@ -84,5 +99,12 @@
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\boost.1.65.1.0\build\native\boost.targets" Condition="Exists('packages\boost.1.65.1.0\build\native\boost.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\boost.1.65.1.0\build\native\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost.1.65.1.0\build\native\boost.targets'))" />
+  </Target>
 </Project>
