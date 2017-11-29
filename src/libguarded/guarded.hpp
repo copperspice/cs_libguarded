@@ -19,6 +19,48 @@
 namespace libguarded
 {
 
+template <typename T, typename D>
+struct Handle
+{
+    Handle(T* t, D& d) :
+        ref(*t),
+        deleter(std::move(d)) {}
+
+    Handle(const Handle& handle) = delete;
+    Handle(Handle&& handle) :
+        ref(handle.ref),
+        deleter(std::move(handle.deleter)) {}
+
+    ~Handle()
+    {
+        deleter(&ref);
+    }
+
+    T* operator->() const
+    {
+        return &ref;
+    }
+
+    const T& operator*() const
+    {
+        return *ref;
+    }
+
+    T& operator*()
+    {
+        return ref;
+    }
+
+    bool operator != (nullptr_t) const
+    {
+        return &ref != nullptr;
+    }
+
+private:
+    T &ref;
+    D deleter;
+};
+
 /**
    \headerfile guarded.hpp <libguarded/guarded.hpp>
 
@@ -40,7 +82,7 @@ class guarded
     class deleter;
 
   public:
-    using handle = std::unique_ptr<T, deleter>;
+    using handle = Handle<T, deleter>;
 
     /**
      Construct a guarded object. This constructor will accept any
@@ -107,6 +149,12 @@ class guarded
         using pointer = T *;
 
         deleter(std::unique_lock<M> lock) : m_lock(std::move(lock))
+        {
+        }
+
+        deleter(const deleter&) = delete;
+
+        deleter(deleter&& d) : m_lock(std::move(d.m_lock)) 
         {
         }
 
