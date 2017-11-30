@@ -1,5 +1,7 @@
 ## libGuarded
 
+[![Build status](https://ci.appveyor.com/api/projects/status/0mo7qmlb227qvtuv?svg=true)](https://ci.appveyor.com/project/janwilmans/libguarded/branch/master)
+
 ### Introduction
 
 The libGuarded library is a standalone header-only library to make correct and deadlock free multithreaded programming easier.
