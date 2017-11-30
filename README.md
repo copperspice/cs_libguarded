@@ -37,6 +37,9 @@ www.copperspice.com/presentations.html
 
 * **Ansel Sermersheim** - *Initial work*
 * **Barbara Geller** - *Testing, Documentation*
+
+### Support
+
 * **Jan Wilmans** - *Modifications for vs2013 and msvc testing*
 * **Odin Holmes** - *Promotions and working on getting us in conan.io*
 
