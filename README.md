@@ -11,12 +11,13 @@ Incorrect usage will result in compiler errors instead of runtime errors.
 
 ### System Requirements
 
-To use [libGuarded](https://github.com/copperspice/libguarded) you will need a C++14 compiler. 
+To use [copperspice/libguarded](https://github.com/copperspice/libguarded) you will need a C++14 compiler. 
+However, the [janwilmans/libguarded](https://github.com/janwilmans/libguarded) repository is modified to work with vs2013 and boost 1.65. So far only **guarded.hpp** and **shared_guarded.hpp** are working and tested.
 
-Currently uses the Autotools build system for building and running the unit test suite. 
-The library has been tested with clang sanitizer and a major code review. 
+[copperspice/libguarded](https://github.com/copperspice/libguarded) currently uses the Autotools build system for building and running the unit test suite. The library has been tested with clang sanitizer and a major code review. 
 
-Addendum: the [janwilmans/libguarded](https://github.com/janwilmans/libguarded) repository is modified to work with vs2013 and boost 1.65. So far only **guarded.hpp** and **shared_guarded.hpp** are working and tested.
+[janwilmans/libguarded] is not reviewed yet but CI tests are running on AppVeyor on vs2013
+
 
 ### Documentation
 
