@@ -11,13 +11,12 @@ Incorrect usage will result in compiler errors instead of runtime errors.
 
 ### System Requirements
 
-To use libGuarded you will need a C++11 compiler and a C++11 standard library. Some of 
-the advanced features of libGuarded leverage the C++14 standard or equivalent functionality 
-in Boost.
+To use [libGuarded](https://github.com/copperspice/libguarded) you will need a C++14 compiler. 
 
 Currently uses the Autotools build system for building and running the unit test suite. 
 The library has been tested with clang sanitizer and a major code review. 
 
+Addendum: the [janwilmans/libguarded](https://github.com/janwilmans/libguarded) repository is modified to work with vs2013 and boost 1.65. So far only **guarded.hpp** and **shared_guarded.hpp** are working and tested.
 
 ### Documentation
 
@@ -38,6 +37,8 @@ www.copperspice.com/presentations.html
 
 * **Ansel Sermersheim** - *Initial work*
 * **Barbara Geller** - *Testing, Documentation*
+* **Jan Wilmans** - *Modifications for vs2013 and msvc testing*
+* **Odin Holmes** - *Promotions and working on getting us in conan.io*
 
 
 ### License
