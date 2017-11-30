@@ -6,12 +6,19 @@
 #include <thread>
 
 #ifndef HAVE_CXX14
-#error This file requires the C++14 shared_mutex functionality
+    //#error This file requires the C++14 shared_mutex functionality
+
+    #include <boost/thread/shared_mutex.hpp>
+    using shared_mutex = boost::shared_timed_mutex;
+    namespace chrono = boost::chrono;
+
+#else
+    #include <shared_mutex>
+    using shared_mutex = std::shared_timed_mutex;
+    namespace chrono = std::chrono;
+
 #endif
 
-#include <shared_mutex>
-using shared_mutex = std::shared_timed_mutex;
-namespace chrono   = std::chrono;
 
 using namespace libguarded;
 
@@ -46,14 +53,14 @@ BOOST_AUTO_TEST_CASE(shared_guarded_1)
         });
 
         std::thread th2([&]() {
-            auto data_handle2 = data.try_lock_for(std::chrono::milliseconds(20));
+            auto data_handle2 = data.try_lock_for(chrono::milliseconds(20));
             if (data_handle2 != nullptr)
                 th2_ok = false;
         });
 
         std::thread th3([&]() {
-            auto data_handle2 = data.try_lock_until(std::chrono::steady_clock::now() +
-                                                    std::chrono::milliseconds(20));
+            auto data_handle2 = data.try_lock_until(chrono::steady_clock::now() +
+                                                    chrono::milliseconds(20));
             if (data_handle2 != nullptr)
                 th3_ok = false;
         });
@@ -84,14 +91,14 @@ BOOST_AUTO_TEST_CASE(shared_guarded_1)
         });
 
         std::thread th2([&]() {
-            auto data_handle2 = data.try_lock_shared_for(std::chrono::milliseconds(20));
+            auto data_handle2 = data.try_lock_shared_for(chrono::milliseconds(20));
             if (data_handle2 != nullptr)
                 th2_ok = false;
         });
 
         std::thread th3([&]() {
-            auto data_handle2 = data.try_lock_shared_until(std::chrono::steady_clock::now() +
-                                                           std::chrono::milliseconds(20));
+            auto data_handle2 = data.try_lock_shared_until(chrono::steady_clock::now() +
+                                                           chrono::milliseconds(20));
             if (data_handle2 != nullptr)
                 th3_ok = false;
         });
@@ -124,7 +131,7 @@ BOOST_AUTO_TEST_CASE(shared_guarded_1)
         });
 
         std::thread th2([&]() {
-            auto data_handle2 = data.try_lock_shared_for(std::chrono::milliseconds(20));
+            auto data_handle2 = data.try_lock_shared_for(chrono::milliseconds(20));
             if (data_handle2 == nullptr)
                 th2_ok = false;
             if (*data_handle2 != 1)
@@ -132,8 +139,8 @@ BOOST_AUTO_TEST_CASE(shared_guarded_1)
         });
 
         std::thread th3([&]() {
-            auto data_handle2 = data.try_lock_shared_until(std::chrono::steady_clock::now() +
-                                                           std::chrono::milliseconds(20));
+            auto data_handle2 = data.try_lock_shared_until(chrono::steady_clock::now() +
+                                                           chrono::milliseconds(20));
             if (data_handle2 == nullptr)
                 th3_ok = false;
             if (*data_handle2 != 1)

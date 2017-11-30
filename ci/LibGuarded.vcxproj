@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\guarded.cpp" />
+    <ClCompile Include="..\test\shared_guarded.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\libguarded\cow_guarded.hpp" />
@@ -55,7 +56,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros">
-    <NuGetPackageImportStamp>92e9a02e</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>c3eeb2b6</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -106,11 +107,21 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="packages\boost.1.65.1.0\build\native\boost.targets" Condition="Exists('packages\boost.1.65.1.0\build\native\boost.targets')" />
+    <Import Project="packages\boost_unit_test_framework-vc120.1.65.1.0\build\native\boost_unit_test_framework-vc120.targets" Condition="Exists('packages\boost_unit_test_framework-vc120.1.65.1.0\build\native\boost_unit_test_framework-vc120.targets')" />
+    <Import Project="packages\boost_thread-vc120.1.65.1.0\build\native\boost_thread-vc120.targets" Condition="Exists('packages\boost_thread-vc120.1.65.1.0\build\native\boost_thread-vc120.targets')" />
+    <Import Project="packages\boost_system-vc120.1.65.1.0\build\native\boost_system-vc120.targets" Condition="Exists('packages\boost_system-vc120.1.65.1.0\build\native\boost_system-vc120.targets')" />
+    <Import Project="packages\boost_date_time-vc120.1.65.1.0\build\native\boost_date_time-vc120.targets" Condition="Exists('packages\boost_date_time-vc120.1.65.1.0\build\native\boost_date_time-vc120.targets')" />
+    <Import Project="packages\boost_chrono-vc120.1.65.1.0\build\native\boost_chrono-vc120.targets" Condition="Exists('packages\boost_chrono-vc120.1.65.1.0\build\native\boost_chrono-vc120.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('packages\boost.1.65.1.0\build\native\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost.1.65.1.0\build\native\boost.targets'))" />
+    <Error Condition="!Exists('packages\boost_unit_test_framework-vc120.1.65.1.0\build\native\boost_unit_test_framework-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_unit_test_framework-vc120.1.65.1.0\build\native\boost_unit_test_framework-vc120.targets'))" />
+    <Error Condition="!Exists('packages\boost_thread-vc120.1.65.1.0\build\native\boost_thread-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_thread-vc120.1.65.1.0\build\native\boost_thread-vc120.targets'))" />
+    <Error Condition="!Exists('packages\boost_system-vc120.1.65.1.0\build\native\boost_system-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_system-vc120.1.65.1.0\build\native\boost_system-vc120.targets'))" />
+    <Error Condition="!Exists('packages\boost_date_time-vc120.1.65.1.0\build\native\boost_date_time-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_date_time-vc120.1.65.1.0\build\native\boost_date_time-vc120.targets'))" />
+    <Error Condition="!Exists('packages\boost_chrono-vc120.1.65.1.0\build\native\boost_chrono-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_chrono-vc120.1.65.1.0\build\native\boost_chrono-vc120.targets'))" />
   </Target>
 </Project>

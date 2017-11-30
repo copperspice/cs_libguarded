@@ -12,6 +12,9 @@
     <ClCompile Include="..\test\guarded.cpp">
       <Filter>tests</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\shared_guarded.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\libguarded\deferred_guarded.hpp">
