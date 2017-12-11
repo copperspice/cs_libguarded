@@ -105,9 +105,8 @@ BOOST_AUTO_TEST_CASE(ordered_guarded_2)
 
     std::thread th4([&data, &th4_ok]() {
         int last_val = 0;
-        while (last_val != 200000) {
-            int new_data;
-            data.read([&new_data](const int &x) { new_data = x; });
+	while (last_val != 200000) {
+	    int new_data = data.read([](const int &x) { return x; });
             if (last_val > new_data) {
                 th4_ok = false;
             }

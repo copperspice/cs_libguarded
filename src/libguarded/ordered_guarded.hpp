@@ -71,7 +71,16 @@ class ordered_guarded
     modify(Func &&func);
 
     template <typename Func>
-    void read(Func &&func) const;
+    typename std::enable_if<
+        std::is_same<decltype(std::declval<Func>()(std::declval<const T &>())), void>::value,
+        void>::type
+    read(Func &&func) const;
+
+    template <typename Func>
+    typename std::enable_if<
+        !std::is_same<decltype(std::declval<Func>()(std::declval<const T &>())), void>::value,
+        decltype(std::declval<Func>()(std::declval<const T &>()))>::type
+    read(Func &&func) const;
 
     shared_handle lock_shared() const;
     shared_handle try_lock_shared() const;
@@ -126,7 +135,22 @@ ordered_guarded<T, M>::modify(Func &&func)
 
 template <typename T, typename M>
 template <typename Func>
-void ordered_guarded<T, M>::read(Func &&func) const
+typename std::enable_if<
+    !std::is_same<decltype(std::declval<Func>()(std::declval<T &>())), void>::value,
+    decltype(std::declval<Func>()(std::declval<T &>()))>::type
+ordered_guarded<T, M>::modify(Func &&func)
+{
+    std::lock_guard<M> lock(m_mutex);
+
+    return func(m_obj);
+}
+
+template <typename T, typename M>
+template <typename Func>
+typename std::enable_if<
+    std::is_same<decltype(std::declval<Func>()(std::declval<const T &>())), void>::value,
+    void>::type
+ordered_guarded<T, M>::read(Func &&func) const
 {
     std::shared_lock<M> lock(m_mutex);
 
@@ -136,11 +160,11 @@ void ordered_guarded<T, M>::read(Func &&func) const
 template <typename T, typename M>
 template <typename Func>
 typename std::enable_if<
-    !std::is_same<decltype(std::declval<Func>()(std::declval<T &>())), void>::value,
-    decltype(std::declval<Func>()(std::declval<T &>()))>::type
-ordered_guarded<T, M>::modify(Func &&func)
+    !std::is_same<decltype(std::declval<Func>()(std::declval<const T &>())), void>::value,
+    decltype(std::declval<Func>()(std::declval<const T &>()))>::type
+ordered_guarded<T, M>::read(Func &&func) const
 {
-    std::lock_guard<M> lock(m_mutex);
+    std::shared_lock<M> lock(m_mutex);
 
     return func(m_obj);
 }
