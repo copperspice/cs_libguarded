@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(ordered_guarded_1)
 
     ordered_guarded<int, shared_mutex> data(0);
 
-    data.modify([](int & x) { ++x; });
+    data.modify([](int &x) { ++x; });
 
     {
         auto data_handle = data.lock_shared();
@@ -69,37 +69,68 @@ BOOST_AUTO_TEST_CASE(ordered_guarded_2)
 {
     ordered_guarded<int, shared_mutex> data(0);
 
+    std::atomic<bool> th1_ok(true);
+    std::atomic<bool> th2_ok(true);
+    std::atomic<bool> th3_ok(true);
+    std::atomic<bool> th4_ok(true);
+
     std::thread th1([&data]() {
         for (int i = 0; i < 100000; ++i) {
-            data.modify([](int & x) { ++x; });
+            data.modify([](int &x) { ++x; });
         }
     });
 
-    std::thread th2([&data]() {
+    std::thread th2([&data, &th2_ok]() {
         for (int i = 0; i < 100000; ++i) {
-            data.modify([](int & x) { ++x; });
+            int check_i = data.modify([i](int &x) {
+                ++x;
+                return i;
+            });
+            if (check_i != i) {
+                th2_ok = false;
+            }
         }
     });
 
-    std::thread th3([&data]() {
+    std::thread th3([&data, &th3_ok]() {
         int last_val = 0;
         while (last_val != 200000) {
             auto data_handle = data.lock_shared();
-            BOOST_CHECK(last_val <= *data_handle);
+            if (last_val > *data_handle) {
+                th3_ok = false;
+            }
             last_val = *data_handle;
+        }
+    });
+
+    std::thread th4([&data, &th4_ok]() {
+        int last_val = 0;
+        while (last_val != 200000) {
+            int new_data;
+            data.read([&new_data](const int &x) { new_data = x; });
+            if (last_val > new_data) {
+                th4_ok = false;
+            }
+            last_val = new_data;
         }
     });
 
     th1.join();
     th2.join();
-    th3.join();
 
     {
-    auto data_handle = data.lock_shared();
+        auto data_handle = data.lock_shared();
 
-    BOOST_CHECK_EQUAL(*data_handle, 200000);
+        BOOST_CHECK_EQUAL(*data_handle, 200000);
     }
 
-    BOOST_CHECK_EQUAL(data.modify([](const int &x) { return x; }), 200000);
+    th3.join();
+    th4.join();
 
+    BOOST_CHECK(th1_ok == true);
+    BOOST_CHECK(th2_ok == true);
+    BOOST_CHECK(th3_ok == true);
+    BOOST_CHECK(th4_ok == true);
+
+    BOOST_CHECK_EQUAL(data.modify([](const int &x) { return x; }), 200000);
 }
