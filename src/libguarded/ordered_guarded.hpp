@@ -15,6 +15,7 @@
 
 #include <memory>
 #include <mutex>
+#include <utility>
 
 #if HAVE_CXX14
 #include <shared_mutex>
@@ -59,7 +60,7 @@ class ordered_guarded
     ordered_guarded(Us &&... data);
 
     template <typename Func>
-    void modify(Func && func);
+    decltype(std::declval<Func>()(std::declval<T>())) modify(Func && func) ;
 
     template <typename Func>
     void read(Func && func) const;
@@ -106,11 +107,11 @@ ordered_guarded<T, M>::ordered_guarded(Us &&... data) : m_obj(std::forward<Us>(d
 
 template <typename T, typename M>
 template <typename Func>
-void ordered_guarded<T, M>::modify(Func && func)
+decltype(std::declval<Func>()(std::declval<T>())) ordered_guarded<T, M>::modify(Func && func)
 {
     std::lock_guard<M> lock(m_mutex);
 
-    func(m_obj);
+    return func(m_obj);
 }
 
 template <typename T, typename M>
