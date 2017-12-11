@@ -27,29 +27,33 @@ Class level documentation for libGuarded is available on the CopperSpice website
 www.copperspice.com/docs/libguarded/index.html
 
 
+
 ### Presentations
 
-For additional information on multithreading refer to my presentations:
+Multiple videos discussing libGuarded and multithreading can be found on the following pages:
 
+www.youtube.com/copperspice <br>
 www.copperspice.com/presentations.html
 
 
 
-### Authors
+### Authors / Contributors
 
-* **Ansel Sermersheim** - *Initial work*
-* **Barbara Geller** - *Testing, Documentation*
+* **Ansel Sermersheim**
+* **Barbara Geller**
+* **Casey Bodley**
+* **Jan Wilmans**
+* **Eric Lemanissier**
 
 ### Support
 
-* **Jan Wilmans** - *Modifications for vs2013 and msvc testing*
 * **Odin Holmes** - *Promotions and working on getting us in conan.io*
 
 
 ### License
 
-This library is released under the BSD 2-clause license. For more information refer to the
-LICENSE file provided with this project. 
+This library is released under the BSD 2-clause license. For more information refer to the LICENSE file provided with this
+project.
 
 
 ### References

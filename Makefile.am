@@ -18,7 +18,7 @@ libguarded_HEADERS = \
 	src/libguarded/rcu_list.hpp \
 	src/libguarded/shared_guarded.hpp
 
-EXTRA_DIST= LICENSE README
+EXTRA_DIST= LICENSE README.md
 
 TESTS=bin/unittest
 

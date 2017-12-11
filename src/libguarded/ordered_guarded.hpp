@@ -15,6 +15,7 @@
 
 #include <memory>
 #include <mutex>
+#include <type_traits>
 
 #if HAVE_CXX14
 #include <shared_mutex>
@@ -59,16 +60,36 @@ class ordered_guarded
     ordered_guarded(Us &&... data);
 
     template <typename Func>
-    void modify(Func && func);
+    typename std::enable_if<
+        std::is_same<decltype(std::declval<Func>()(std::declval<T &>())), void>::value, void>::type
+    modify(Func &&func);
+
+    template <typename Func>
+    typename std::enable_if<
+        !std::is_same<decltype(std::declval<Func>()(std::declval<T &>())), void>::value,
+        decltype(std::declval<Func>()(std::declval<T &>()))>::type
+    modify(Func &&func);
+
+    template <typename Func>
+    typename std::enable_if<
+        std::is_same<decltype(std::declval<Func>()(std::declval<const T &>())), void>::value,
+        void>::type
+    read(Func &&func) const;
+
+    template <typename Func>
+    typename std::enable_if<
+        !std::is_same<decltype(std::declval<Func>()(std::declval<const T &>())), void>::value,
+        decltype(std::declval<Func>()(std::declval<const T &>()))>::type
+    read(Func &&func) const;
 
     shared_handle lock_shared() const;
     shared_handle try_lock_shared() const;
 
     template <class Duration>
-    shared_handle try_lock_shared_for(const Duration & duration) const;
+    shared_handle try_lock_shared_for(const Duration &duration) const;
 
     template <class TimePoint>
-    shared_handle try_lock_shared_until(const TimePoint & timepoint) const;
+    shared_handle try_lock_shared_until(const TimePoint &timepoint) const;
 
   private:
     class shared_deleter
@@ -76,11 +97,11 @@ class ordered_guarded
       public:
         using pointer = const T *;
 
-        shared_deleter(M & mutex) : m_deleter_mutex(mutex)
+        shared_deleter(M &mutex) : m_deleter_mutex(mutex)
         {
         }
 
-        void operator()(const T * ptr)
+        void operator()(const T *ptr)
         {
             if (ptr) {
                 m_deleter_mutex.unlock_shared();
@@ -88,10 +109,10 @@ class ordered_guarded
         }
 
       private:
-        M & m_deleter_mutex;
+        M &m_deleter_mutex;
     };
 
-    T         m_obj;
+    T m_obj;
     mutable M m_mutex;
 };
 
@@ -103,11 +124,49 @@ ordered_guarded<T, M>::ordered_guarded(Us &&... data) : m_obj(std::forward<Us>(d
 
 template <typename T, typename M>
 template <typename Func>
-void ordered_guarded<T, M>::modify(Func && func)
+typename std::enable_if<
+    std::is_same<decltype(std::declval<Func>()(std::declval<T &>())), void>::value, void>::type
+ordered_guarded<T, M>::modify(Func &&func)
 {
     std::lock_guard<M> lock(m_mutex);
 
     func(m_obj);
+}
+
+template <typename T, typename M>
+template <typename Func>
+typename std::enable_if<
+    !std::is_same<decltype(std::declval<Func>()(std::declval<T &>())), void>::value,
+    decltype(std::declval<Func>()(std::declval<T &>()))>::type
+ordered_guarded<T, M>::modify(Func &&func)
+{
+    std::lock_guard<M> lock(m_mutex);
+
+    return func(m_obj);
+}
+
+template <typename T, typename M>
+template <typename Func>
+typename std::enable_if<
+    std::is_same<decltype(std::declval<Func>()(std::declval<const T &>())), void>::value,
+    void>::type
+ordered_guarded<T, M>::read(Func &&func) const
+{
+    std::shared_lock<M> lock(m_mutex);
+
+    func(m_obj);
+}
+
+template <typename T, typename M>
+template <typename Func>
+typename std::enable_if<
+    !std::is_same<decltype(std::declval<Func>()(std::declval<const T &>())), void>::value,
+    decltype(std::declval<Func>()(std::declval<const T &>()))>::type
+ordered_guarded<T, M>::read(Func &&func) const
+{
+    std::shared_lock<M> lock(m_mutex);
+
+    return func(m_obj);
 }
 
 template <typename T, typename M>
@@ -129,7 +188,7 @@ auto ordered_guarded<T, M>::try_lock_shared() const -> shared_handle
 
 template <typename T, typename M>
 template <typename Duration>
-auto ordered_guarded<T, M>::try_lock_shared_for(const Duration & duration) const -> shared_handle
+auto ordered_guarded<T, M>::try_lock_shared_for(const Duration &duration) const -> shared_handle
 {
     if (m_mutex.try_lock_shared_for(duration)) {
         return std::unique_ptr<const T, shared_deleter>(&m_obj, shared_deleter(m_mutex));
@@ -140,8 +199,7 @@ auto ordered_guarded<T, M>::try_lock_shared_for(const Duration & duration) const
 
 template <typename T, typename M>
 template <typename TimePoint>
-auto ordered_guarded<T, M>::try_lock_shared_until(const TimePoint & timepoint) const
-    -> shared_handle
+auto ordered_guarded<T, M>::try_lock_shared_until(const TimePoint &timepoint) const -> shared_handle
 {
     if (m_mutex.try_lock_shared_until(timepoint)) {
         return std::unique_ptr<const T, shared_deleter>(&m_obj, shared_deleter(m_mutex));
