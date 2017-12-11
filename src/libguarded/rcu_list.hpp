@@ -144,11 +144,11 @@ class rcu_list
         node *zombie_node{nullptr};
     };
 
-    using alloc_trait             = std::allocator_traits<Alloc>;
-    using node_alloc_t            = typename alloc_trait::template rebind_alloc<node>;
-    using node_alloc_trait        = std::allocator_traits<node_alloc_t>;
-    using zombie_alloc_t          = typename alloc_trait::template rebind_alloc<zombie_list_node>;
-    using zombie_alloc_trait      = std::allocator_traits<zombie_alloc_t>;
+    using alloc_trait        = std::allocator_traits<Alloc>;
+    using node_alloc_t       = typename alloc_trait::template rebind_alloc<node>;
+    using node_alloc_trait   = std::allocator_traits<node_alloc_t>;
+    using zombie_alloc_t     = typename alloc_trait::template rebind_alloc<zombie_list_node>;
+    using zombie_alloc_trait = std::allocator_traits<zombie_alloc_t>;
 
     std::atomic<node *> m_head{nullptr};
     std::atomic<node *> m_tail{nullptr};
@@ -157,7 +157,7 @@ class rcu_list
 
     M m_write_mutex;
 
-    mutable node_alloc_t   m_node_alloc;
+    mutable node_alloc_t m_node_alloc;
     mutable zombie_alloc_t m_zombie_alloc;
 };
 
@@ -168,15 +168,18 @@ namespace detail
 
 // allocator-aware deleter for unique_ptr
 template <typename Alloc>
-class deallocator {
-    using allocator_type = Alloc;
+class deallocator
+{
+    using allocator_type   = Alloc;
     using allocator_traits = std::allocator_traits<allocator_type>;
-    using pointer = typename allocator_traits::pointer;
+    using pointer          = typename allocator_traits::pointer;
 
     allocator_type alloc;
 
   public:
-    explicit deallocator(const allocator_type& alloc) noexcept : alloc(alloc) {}
+    explicit deallocator(const allocator_type &alloc) noexcept : alloc(alloc)
+    {
+    }
 
     void operator()(pointer p)
     {
@@ -187,11 +190,10 @@ class deallocator {
 
 // unique_ptr counterpart for std::allocate_shared()
 template <typename T, typename Alloc, typename... Args>
-std::unique_ptr<T, deallocator<Alloc>> allocate_unique(Alloc& alloc,
-                                                       Args&&... args)
+std::unique_ptr<T, deallocator<Alloc>> allocate_unique(Alloc &alloc, Args &&... args)
 {
     using allocator_traits = std::allocator_traits<Alloc>;
-    auto p = allocator_traits::allocate(alloc, 1);
+    auto p                 = allocator_traits::allocate(alloc, 1);
     try {
         allocator_traits::construct(alloc, p, std::forward<Args>(args)...);
         return {p, deallocator<Alloc>{alloc}};
@@ -229,8 +231,8 @@ template <typename T, typename M, typename Alloc>
 void rcu_list<T, M, Alloc>::rcu_guard::rcu_read_lock(const rcu_list<T, M, Alloc> &list)
 
 {
-    m_list                    = &list;
-    m_zombie                  = zombie_alloc_trait::allocate(list.m_zombie_alloc, 1);
+    m_list   = &list;
+    m_zombie = zombie_alloc_trait::allocate(list.m_zombie_alloc, 1);
     zombie_alloc_trait::construct(list.m_zombie_alloc, m_zombie, this);
     zombie_list_node *oldNext = list.m_zombie_head.load(std::memory_order_relaxed);
 
@@ -336,22 +338,22 @@ class rcu_list<T, M, Alloc>::iterator
         return *this;
     }
 
-    const_iterator &operator--()
+    iterator &operator--()
     {
         m_current = m_current->prev.load();
         return *this;
     }
 
-    const_iterator operator++(int)
+    iterator operator++(int)
     {
-        const_iterator old(*this);
+        iterator old(*this);
         ++(*this);
         return old;
     }
 
-    const_iterator operator--(int)
+    iterator operator--(int)
     {
-        const_iterator old(*this);
+        iterator old(*this);
         --(*this);
         return old;
     }
@@ -360,7 +362,8 @@ class rcu_list<T, M, Alloc>::iterator
     friend rcu_list<T, M, Alloc>;
     friend rcu_list<T, M, Alloc>::const_iterator;
 
-    explicit iterator(const typename rcu_list<T, M, Alloc>::const_iterator &it) : m_current(it.m_current)
+    explicit iterator(const typename rcu_list<T, M, Alloc>::const_iterator &it)
+        : m_current(it.m_current)
     {
     }
 
@@ -389,11 +392,12 @@ class rcu_list<T, M, Alloc>::const_iterator
     const T &operator*() const
     {
         return m_current->data;
-    };
+    }
+
     const T *operator->() const
     {
         return &(m_current->data);
-    };
+    }
 
     bool operator==(const end_iterator &) const
     {
@@ -476,9 +480,7 @@ rcu_list<T, M, Alloc>::rcu_list()
 }
 
 template <typename T, typename M, typename Alloc>
-rcu_list<T, M, Alloc>::rcu_list(const Alloc &alloc)
-  : m_node_alloc(alloc),
-    m_zombie_alloc(alloc)
+rcu_list<T, M, Alloc>::rcu_list(const Alloc &alloc) : m_node_alloc(alloc), m_zombie_alloc(alloc)
 {
 }
 

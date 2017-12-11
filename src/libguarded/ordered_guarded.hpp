@@ -77,10 +77,10 @@ class ordered_guarded
     shared_handle try_lock_shared() const;
 
     template <class Duration>
-    shared_handle try_lock_shared_for(const Duration & duration) const;
+    shared_handle try_lock_shared_for(const Duration &duration) const;
 
     template <class TimePoint>
-    shared_handle try_lock_shared_until(const TimePoint & timepoint) const;
+    shared_handle try_lock_shared_until(const TimePoint &timepoint) const;
 
   private:
     class shared_deleter
@@ -88,11 +88,11 @@ class ordered_guarded
       public:
         using pointer = const T *;
 
-        shared_deleter(M & mutex) : m_deleter_mutex(mutex)
+        shared_deleter(M &mutex) : m_deleter_mutex(mutex)
         {
         }
 
-        void operator()(const T * ptr)
+        void operator()(const T *ptr)
         {
             if (ptr) {
                 m_deleter_mutex.unlock_shared();
@@ -100,10 +100,10 @@ class ordered_guarded
         }
 
       private:
-        M & m_deleter_mutex;
+        M &m_deleter_mutex;
     };
 
-    T         m_obj;
+    T m_obj;
     mutable M m_mutex;
 };
 
@@ -164,7 +164,7 @@ auto ordered_guarded<T, M>::try_lock_shared() const -> shared_handle
 
 template <typename T, typename M>
 template <typename Duration>
-auto ordered_guarded<T, M>::try_lock_shared_for(const Duration & duration) const -> shared_handle
+auto ordered_guarded<T, M>::try_lock_shared_for(const Duration &duration) const -> shared_handle
 {
     if (m_mutex.try_lock_shared_for(duration)) {
         return std::unique_ptr<const T, shared_deleter>(&m_obj, shared_deleter(m_mutex));
@@ -175,8 +175,7 @@ auto ordered_guarded<T, M>::try_lock_shared_for(const Duration & duration) const
 
 template <typename T, typename M>
 template <typename TimePoint>
-auto ordered_guarded<T, M>::try_lock_shared_until(const TimePoint & timepoint) const
-    -> shared_handle
+auto ordered_guarded<T, M>::try_lock_shared_until(const TimePoint &timepoint) const -> shared_handle
 {
     if (m_mutex.try_lock_shared_until(timepoint)) {
         return std::unique_ptr<const T, shared_deleter>(&m_obj, shared_deleter(m_mutex));
