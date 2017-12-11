@@ -58,6 +58,8 @@ class rcu_list
     class const_iterator;
     class reverse_iterator;
     class const_reverse_iterator;
+    class end_iterator;
+    class end_reverse_iterator;
 
     class rcu_guard;
     using rcu_write_guard = rcu_guard;
@@ -74,11 +76,11 @@ class rcu_list
     ~rcu_list();
 
     iterator begin();
-    iterator end();
+    end_iterator end();
     const_iterator begin() const;
-    const_iterator end() const;
+    end_iterator end() const;
     const_iterator cbegin() const;
-    const_iterator cend() const;
+    end_iterator cend() const;
 
     void clear();
 
@@ -318,14 +320,14 @@ class rcu_list<T, M, Alloc>::iterator
         return &(m_current->data);
     }
 
-    bool operator==(const const_iterator &other) const
+    bool operator==(const end_iterator &) const
     {
-        return m_current == other.m_current;
+        return m_current == nullptr;
     }
 
-    bool operator!=(const const_iterator &other) const
+    bool operator!=(const end_iterator &) const
     {
-        return m_current != other.m_current;
+        return m_current != nullptr;
     }
 
     iterator &operator++()
@@ -393,14 +395,14 @@ class rcu_list<T, M, Alloc>::const_iterator
         return &(m_current->data);
     };
 
-    bool operator==(const const_iterator &other) const
+    bool operator==(const end_iterator &) const
     {
-        return m_current == other.m_current;
+        return m_current == nullptr;
     }
 
-    bool operator!=(const const_iterator &other) const
+    bool operator!=(const end_iterator &) const
     {
-        return m_current != other.m_current;
+        return m_current != nullptr;
     }
 
     const_iterator &operator++()
@@ -435,6 +437,33 @@ class rcu_list<T, M, Alloc>::const_iterator
     explicit const_iterator(node *n) : m_current(n){};
 
     node *m_current;
+};
+
+/*----------------------------------------*/
+
+template <typename T, typename M, typename Alloc>
+class rcu_list<T, M, Alloc>::end_iterator
+{
+  public:
+    bool operator==(iterator iter) const
+    {
+        return iter == *this;
+    }
+
+    bool operator!=(iterator iter) const
+    {
+        return iter != *this;
+    }
+
+    bool operator==(const_iterator iter) const
+    {
+        return iter == *this;
+    }
+
+    bool operator!=(const_iterator iter) const
+    {
+        return iter != *this;
+    }
 };
 
 /*----------------------------------------*/
@@ -487,9 +516,9 @@ auto rcu_list<T, M, Alloc>::begin() -> iterator
 }
 
 template <typename T, typename M, typename Alloc>
-auto rcu_list<T, M, Alloc>::end() -> iterator
+auto rcu_list<T, M, Alloc>::end() -> end_iterator
 {
-    return iterator();
+    return end_iterator();
 }
 
 template <typename T, typename M, typename Alloc>
@@ -499,9 +528,9 @@ auto rcu_list<T, M, Alloc>::begin() const -> const_iterator
 }
 
 template <typename T, typename M, typename Alloc>
-auto rcu_list<T, M, Alloc>::end() const -> const_iterator
+auto rcu_list<T, M, Alloc>::end() const -> end_iterator
 {
-    return const_iterator();
+    return end_iterator();
 }
 
 template <typename T, typename M, typename Alloc>
