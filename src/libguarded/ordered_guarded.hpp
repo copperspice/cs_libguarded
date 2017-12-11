@@ -15,6 +15,7 @@
 
 #include <memory>
 #include <mutex>
+#include <type_traits>
 
 #if HAVE_CXX14
 #include <shared_mutex>
@@ -59,10 +60,18 @@ class ordered_guarded
     ordered_guarded(Us &&... data);
 
     template <typename Func>
-    void modify(Func && func);
+    typename std::enable_if<
+        std::is_same<decltype(std::declval<Func>()(std::declval<T &>())), void>::value, void>::type
+    modify(Func &&func);
 
     template <typename Func>
-    void read(Func && func) const;
+    typename std::enable_if<
+        !std::is_same<decltype(std::declval<Func>()(std::declval<T &>())), void>::value,
+        decltype(std::declval<Func>()(std::declval<T &>()))>::type
+    modify(Func &&func);
+
+    template <typename Func>
+    void read(Func &&func) const;
 
     shared_handle lock_shared() const;
     shared_handle try_lock_shared() const;
@@ -106,7 +115,9 @@ ordered_guarded<T, M>::ordered_guarded(Us &&... data) : m_obj(std::forward<Us>(d
 
 template <typename T, typename M>
 template <typename Func>
-void ordered_guarded<T, M>::modify(Func && func)
+typename std::enable_if<
+    std::is_same<decltype(std::declval<Func>()(std::declval<T &>())), void>::value, void>::type
+ordered_guarded<T, M>::modify(Func &&func)
 {
     std::lock_guard<M> lock(m_mutex);
 
@@ -115,11 +126,23 @@ void ordered_guarded<T, M>::modify(Func && func)
 
 template <typename T, typename M>
 template <typename Func>
-void ordered_guarded<T, M>::read(Func && func) const
+void ordered_guarded<T, M>::read(Func &&func) const
 {
     std::shared_lock<M> lock(m_mutex);
 
     func(m_obj);
+}
+
+template <typename T, typename M>
+template <typename Func>
+typename std::enable_if<
+    !std::is_same<decltype(std::declval<Func>()(std::declval<T &>())), void>::value,
+    decltype(std::declval<Func>()(std::declval<T &>()))>::type
+ordered_guarded<T, M>::modify(Func &&func)
+{
+    std::lock_guard<M> lock(m_mutex);
+
+    return func(m_obj);
 }
 
 template <typename T, typename M>

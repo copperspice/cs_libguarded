@@ -94,7 +94,12 @@ BOOST_AUTO_TEST_CASE(ordered_guarded_2)
     th2.join();
     th3.join();
 
+    {
     auto data_handle = data.lock_shared();
 
     BOOST_CHECK_EQUAL(*data_handle, 200000);
+    }
+
+    BOOST_CHECK_EQUAL(data.modify([](const int &x) { return x; }), 200000);
+
 }
