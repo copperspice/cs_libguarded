@@ -1,6 +1,6 @@
 /***********************************************************************
 *
-* Copyright (c) 2015-2017 Ansel Sermersheim
+* Copyright (c) 2015-2018 Ansel Sermersheim
 * All rights reserved.
 *
 * This file is part of libguarded
