@@ -22,7 +22,7 @@ namespace libguarded
 template <typename T, typename D>
 struct Handle
 {
-    Handle(T* t, D& d) :
+    Handle(T* t, D&& d) :
         ref(*t),
         deleter(std::move(d)) {}
 
