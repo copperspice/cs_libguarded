@@ -22,42 +22,42 @@ namespace libguarded
 template <typename T, typename D>
 struct Handle
 {
-    Handle(T* t, D&& d) :
-        ref(*t),
+    Handle(T* ptr, D&& d) :
+        ptr(ptr),
         deleter(std::move(d)) {}
 
     Handle(const Handle& handle) = delete;
     Handle(Handle&& handle) :
-        ref(handle.ref),
+        ptr(handle.ptr),
         deleter(std::move(handle.deleter)) {}
 
     ~Handle()
     {
-        deleter(&ref);
+        deleter(ptr);
     }
 
     T* operator->() const
     {
-        return &ref;
+        return ptr;
     }
 
     const T& operator*() const
     {
-        return *ref;
+        return *ptr;
     }
 
     T& operator*()
     {
-        return ref;
+        return *ptr;
     }
 
     bool operator != (nullptr_t) const
     {
-        return &ref != nullptr;
+        return ptr != nullptr;
     }
 
 private:
-    T &ref;
+    T *ptr;
     D deleter;
 };
 
@@ -205,7 +205,7 @@ auto guarded<T, M>::try_lock_for(const Duration &d) -> handle
     std::unique_lock<M> lock(m_mutex, d);
 
     if (lock.owns_lock()) {
-        return handle(&m_obj, deleter(std::move(lock)));
+        return handle(&m_obj, deleter(std::move(lock))); // not covered by unittest
     } else {
         return handle(nullptr, deleter(std::move(lock)));
     }
@@ -218,7 +218,7 @@ auto guarded<T, M>::try_lock_until(const TimePoint &tp) -> handle
     std::unique_lock<M> lock(m_mutex, tp);
 
     if (lock.owns_lock()) {
-        return handle(&m_obj, deleter(std::move(lock)));
+        return handle(&m_obj, deleter(std::move(lock))); // not covered by unittest
     } else {
         return handle(nullptr, deleter(std::move(lock)));
     }
