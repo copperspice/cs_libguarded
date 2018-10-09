@@ -5,21 +5,6 @@
 #include <atomic>
 #include <thread>
 
-#ifndef HAVE_CXX14
-    //#error This file requires the C++14 shared_mutex functionality
-
-    #include <boost/thread/shared_mutex.hpp>
-    using shared_mutex = boost::shared_timed_mutex;
-    namespace chrono = boost::chrono;
-
-#else
-    #include <shared_mutex>
-    using shared_mutex = std::shared_timed_mutex;
-    namespace chrono = std::chrono;
-
-#endif
-
-
 using namespace libguarded;
 
 BOOST_AUTO_TEST_CASE(shared_guarded_1)

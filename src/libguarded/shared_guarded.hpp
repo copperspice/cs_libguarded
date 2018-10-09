@@ -15,13 +15,14 @@
 
 #include <memory>
 
-#if HAVE_CXX14
-#include <shared_mutex>
+#ifndef HAVE_CXX14
+	#include <boost/thread/shared_mutex.hpp>
+	using shared_mutex = boost::shared_timed_mutex;
+	namespace chrono = boost::chrono;
 #else
-namespace std
-{
-class shared_timed_mutex;
-}
+	#include <shared_mutex>
+	using shared_mutex = std::shared_timed_mutex;
+	namespace chrono = std::chrono;
 #endif
 
 namespace libguarded
