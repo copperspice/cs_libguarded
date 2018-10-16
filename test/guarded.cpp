@@ -1,7 +1,8 @@
-#include <libguarded/guarded.hpp>
-
+#define BOOST_NO_CXX11_TEMPLATE_ALIASES 
 #define BOOST_TEST_MODULE guarded_test
-#include <boost/test/included/unit_test.hpp>
+#include <boost/test/unit_test.hpp>
+
+#include <libguarded/guarded.hpp>
 
 #include <atomic>
 #include <thread>
@@ -87,3 +88,4 @@ BOOST_AUTO_TEST_CASE(guarded_2)
 
     BOOST_CHECK_EQUAL(*data_handle, 20000);
 }
+

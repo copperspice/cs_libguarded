@@ -1,6 +1,7 @@
-#include <libguarded/shared_guarded.hpp>
-
+#define BOOST_NO_CXX11_TEMPLATE_ALIASES
 #include <boost/test/unit_test.hpp>
+
+#include <libguarded/shared_guarded.hpp>
 
 #include <atomic>
 #include <thread>
@@ -10,7 +11,7 @@ using namespace libguarded;
 BOOST_AUTO_TEST_CASE(shared_guarded_1)
 {
 
-    shared_guarded<int, shared_mutex> data(0);
+    shared_guarded<int> data(0);
 
     {
         auto data_handle = data.lock();
@@ -145,7 +146,7 @@ BOOST_AUTO_TEST_CASE(shared_guarded_1)
 
 BOOST_AUTO_TEST_CASE(shared_guarded_2)
 {
-    shared_guarded<int, shared_mutex> data(0);
+    shared_guarded<int> data(0);
 
     std::thread th1([&data]() {
         for (int i = 0; i < 100000; ++i) {

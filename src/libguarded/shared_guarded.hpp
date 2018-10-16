@@ -1,29 +1,21 @@
 /***********************************************************************
-*
-* Copyright (c) 2015-2017 Ansel Sermersheim
-* All rights reserved.
-*
-* This file is part of libguarded
-*
-* libguarded is free software, released under the BSD 2-Clause license.
-* For license details refer to LICENSE provided with this project.
-*
-***********************************************************************/
+ *
+ * Copyright (c) 2015-2017 Ansel Sermersheim
+ * All rights reserved.
+ *
+ * This file is part of libguarded
+ *
+ * libguarded is free software, released under the BSD 2-Clause license.
+ * For license details refer to LICENSE provided with this project.
+ *
+ ***********************************************************************/
 
 #ifndef LIBGUARDED_SHARED_GUARDED_HPP
 #define LIBGUARDED_SHARED_GUARDED_HPP
 
 #include <memory>
 
-#ifndef HAVE_CXX14
-	#include <boost/thread/shared_mutex.hpp>
-	using shared_mutex = boost::shared_timed_mutex;
-	namespace chrono = boost::chrono;
-#else
-	#include <shared_mutex>
-	using shared_mutex = std::shared_timed_mutex;
-	namespace chrono = std::chrono;
-#endif
+#include "feature_check.hpp"
 
 namespace libguarded
 {
@@ -41,7 +33,7 @@ namespace libguarded
    The handle returned by the various lock methods is moveable but not
    copyable.
 */
-template <typename T, typename M = std::shared_timed_mutex>
+template <typename T, typename M = shared_timed_mutex>
 class shared_guarded
 {
   private:
@@ -60,20 +52,20 @@ class shared_guarded
     handle try_lock();
 
     template <class Duration>
-    handle try_lock_for(const Duration & duration);
+    handle try_lock_for(const Duration &duration);
 
     template <class TimePoint>
-    handle try_lock_until(const TimePoint & timepoint);
+    handle try_lock_until(const TimePoint &timepoint);
 
     // shared access, note "shared" in method names
     shared_handle lock_shared() const;
     shared_handle try_lock_shared() const;
 
     template <class Duration>
-    shared_handle try_lock_shared_for(const Duration & duration) const;
+    shared_handle try_lock_shared_for(const Duration &duration) const;
 
     template <class TimePoint>
-    shared_handle try_lock_shared_until(const TimePoint & timepoint) const;
+    shared_handle try_lock_shared_until(const TimePoint &timepoint) const;
 
   private:
     class deleter
@@ -81,11 +73,11 @@ class shared_guarded
       public:
         using pointer = T *;
 
-        deleter(M & mutex) : m_deleter_mutex(mutex)
+        deleter(M &mutex) : m_deleter_mutex(mutex)
         {
         }
 
-        void operator()(T * ptr)
+        void operator()(T *ptr)
         {
             if (ptr) {
                 m_deleter_mutex.unlock();
@@ -93,7 +85,7 @@ class shared_guarded
         }
 
       private:
-        M & m_deleter_mutex;
+        M &m_deleter_mutex;
     };
 
     class shared_deleter
@@ -101,11 +93,11 @@ class shared_guarded
       public:
         using pointer = const T *;
 
-        shared_deleter(M & mutex) : m_deleter_mutex(mutex)
+        shared_deleter(M &mutex) : m_deleter_mutex(mutex)
         {
         }
 
-        void operator()(const T * ptr)
+        void operator()(const T *ptr)
         {
             if (ptr) {
                 m_deleter_mutex.unlock_shared();
@@ -113,10 +105,10 @@ class shared_guarded
         }
 
       private:
-        M & m_deleter_mutex;
+        M &m_deleter_mutex;
     };
 
-    T         m_obj;
+    T m_obj;
     mutable M m_mutex;
 };
 
@@ -145,7 +137,7 @@ auto shared_guarded<T, M>::try_lock() -> handle
 
 template <typename T, typename M>
 template <typename Duration>
-auto shared_guarded<T, M>::try_lock_for(const Duration & duration) -> handle
+auto shared_guarded<T, M>::try_lock_for(const Duration &duration) -> handle
 {
     if (m_mutex.try_lock_for(duration)) {
         return handle(&m_obj, deleter(m_mutex));
@@ -156,7 +148,7 @@ auto shared_guarded<T, M>::try_lock_for(const Duration & duration) -> handle
 
 template <typename T, typename M>
 template <typename TimePoint>
-auto shared_guarded<T, M>::try_lock_until(const TimePoint & timepoint) -> handle
+auto shared_guarded<T, M>::try_lock_until(const TimePoint &timepoint) -> handle
 {
     if (m_mutex.try_lock_until(timepoint)) {
         return handle(&m_obj, deleter(m_mutex));
@@ -184,7 +176,7 @@ auto shared_guarded<T, M>::try_lock_shared() const -> shared_handle
 
 template <typename T, typename M>
 template <typename Duration>
-auto shared_guarded<T, M>::try_lock_shared_for(const Duration & d) const -> shared_handle
+auto shared_guarded<T, M>::try_lock_shared_for(const Duration &d) const -> shared_handle
 {
     if (m_mutex.try_lock_shared_for(d)) {
         return shared_handle(&m_obj, shared_deleter(m_mutex));
@@ -195,7 +187,7 @@ auto shared_guarded<T, M>::try_lock_shared_for(const Duration & d) const -> shar
 
 template <typename T, typename M>
 template <typename TimePoint>
-auto shared_guarded<T, M>::try_lock_shared_until(const TimePoint & tp) const -> shared_handle
+auto shared_guarded<T, M>::try_lock_shared_until(const TimePoint &tp) const -> shared_handle
 {
     if (m_mutex.try_lock_shared_until(tp)) {
         return shared_handle(&m_obj, shared_deleter(m_mutex));
@@ -203,6 +195,6 @@ auto shared_guarded<T, M>::try_lock_shared_until(const TimePoint & tp) const -> 
         return shared_handle(nullptr, shared_deleter(m_mutex));
     }
 }
-}
+} // namespace libguarded
 
 #endif

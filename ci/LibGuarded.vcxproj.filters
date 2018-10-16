@@ -41,6 +41,9 @@
     <ClInclude Include="..\src\libguarded\cow_guarded.hpp">
       <Filter>headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\libguarded\feature_check.hpp">
+      <Filter>headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
