@@ -4,19 +4,12 @@
 
 #include <thread>
 
-#ifndef HAVE_CXX14
-#error This file requires the C++14 shared_mutex functionality
-#endif
-
-#include <shared_mutex>
-using shared_mutex = std::shared_timed_mutex;
-
 using namespace libguarded;
 
 BOOST_AUTO_TEST_CASE(deferred_guarded_1)
 {
 
-    deferred_guarded<int, shared_mutex> data(0);
+    deferred_guarded<int> data(0);
 
     data.modify_detach([](int & x) { ++x; });
 
@@ -66,7 +59,7 @@ BOOST_AUTO_TEST_CASE(deferred_guarded_1)
 
 BOOST_AUTO_TEST_CASE(deferred_guarded_2)
 {
-    deferred_guarded<int, shared_mutex> data(0);
+    deferred_guarded<int> data(0);
 
     std::thread th1([&data]() {
         for (int i = 0; i < 100000; ++i) {

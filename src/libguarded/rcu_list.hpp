@@ -18,6 +18,7 @@
 #include <memory>
 #include <mutex>
 
+#include <libguarded/feature_check.hpp>
 #include <libguarded/rcu_guarded.hpp>
 
 namespace libguarded

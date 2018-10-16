@@ -14,6 +14,7 @@
 #define LIBGUARDED_RCU_GUARDED_HPP
 
 #include <memory>
+#include <libguarded/feature_check.hpp>
 
 namespace libguarded
 {

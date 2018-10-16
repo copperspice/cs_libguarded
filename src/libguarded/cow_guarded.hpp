@@ -17,6 +17,7 @@
 #include <memory>
 #include <mutex>
 
+#include <libguarded/feature_check.hpp>
 #include <libguarded/lr_guarded.hpp>
 
 namespace libguarded

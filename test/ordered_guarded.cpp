@@ -11,7 +11,7 @@ BOOST_AUTO_TEST_CASE(ordered_guarded_1)
 {
     ordered_guarded<int> data(0);
 
-    data.modify([](int &x) { ++x; });
+    data.modify([](int &x) { ++x; });       // vs2013 C1001: An internal error: see ordered_guarded<T, M>::modify(Func &&func)
 
     {
         auto data_handle = data.lock_shared();
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(ordered_guarded_1)
 
 BOOST_AUTO_TEST_CASE(ordered_guarded_2)
 {
-    ordered_guarded<int, shared_mutex> data(0);
+    ordered_guarded<int> data(0);
 
     std::atomic<bool> th1_ok(true);
     std::atomic<bool> th2_ok(true);

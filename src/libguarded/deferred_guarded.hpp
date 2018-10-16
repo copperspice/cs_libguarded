@@ -13,21 +13,13 @@
 #ifndef LIBGUARDED_DEFERRED_GUARDED_HPP
 #define LIBGUARDED_DEFERRED_GUARDED_HPP
 
+#include <libguarded/feature_check.hpp>
 #include <libguarded/guarded.hpp>
 
 #include <atomic>
 #include <future>
 #include <memory>
 #include <vector>
-
-#if HAVE_CXX14
-#include <shared_mutex>
-#else
-namespace std
-{
-class shared_timed_mutex;
-}
-#endif
 
 namespace libguarded
 {
@@ -48,7 +40,7 @@ typename std::add_lvalue_reference<T>::type declref();
    The shared_handle returned by the various lock methods is moveable
    but not copyable.
 */
-template <typename T, typename M = std::shared_timed_mutex>
+template <typename T, typename M = shared_timed_mutex>
 class deferred_guarded
 {
   private:

@@ -18,6 +18,8 @@
 #include <mutex>
 #include <thread>
 
+#include "feature_check.hpp"
+
 namespace libguarded
 {
 
