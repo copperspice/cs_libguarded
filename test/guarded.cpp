@@ -1,8 +1,7 @@
-#define BOOST_NO_CXX11_TEMPLATE_ALIASES 
+#include <libguarded/guarded.hpp>
+
 #define BOOST_TEST_MODULE guarded_test
 #include <boost/test/unit_test.hpp>
-
-#include <libguarded/guarded.hpp>
 
 #include <atomic>
 #include <thread>

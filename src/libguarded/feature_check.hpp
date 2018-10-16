@@ -4,6 +4,7 @@
 #ifdef HAVE_CXX14
     #include <shared_mutex>
 #else
+    #define BOOST_NO_CXX11_TEMPLATE_ALIASES
     #include <boost/thread/shared_mutex.hpp>
 #endif
 

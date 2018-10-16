@@ -17,14 +17,7 @@
 #include <mutex>
 #include <type_traits>
 
-#if HAVE_CXX14
-#include <shared_mutex>
-#else
-namespace std
-{
-class shared_timed_mutex;
-}
-#endif
+#include "feature_check.hpp"
 
 namespace libguarded
 {
@@ -43,14 +36,15 @@ namespace libguarded
    The handle returned by the various lock methods is moveable but not
    copyable.
 */
-template <typename T, typename M = std::shared_timed_mutex>
+template <typename T, typename M = shared_timed_mutex>
 class ordered_guarded
 {
   private:
     class shared_deleter;
 
   public:
-    using shared_handle = std::unique_ptr<const T, shared_deleter>;
+    //using shared_handle = std::unique_ptr<const T, shared_deleter>;
+    typedef std::unique_ptr<const T, shared_deleter> shared_handle;
 
     /**
      Construct a guarded object. This constructor will accept any number
@@ -95,7 +89,8 @@ class ordered_guarded
     class shared_deleter
     {
       public:
-        using pointer = const T *;
+        //using pointer = const T *;
+        typedef const T * pointer;
 
         shared_deleter(M &mutex) : m_deleter_mutex(mutex)
         {

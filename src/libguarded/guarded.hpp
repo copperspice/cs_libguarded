@@ -13,6 +13,8 @@
 #ifndef LIBGUARDED_GUARDED_HPP
 #define LIBGUARDED_GUARDED_HPP
 
+#include "feature_check.hpp"
+
 #include <memory>
 #include <mutex>
 

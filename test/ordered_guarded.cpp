@@ -5,19 +5,11 @@
 #include <atomic>
 #include <thread>
 
-#ifndef HAVE_CXX14
-#error This file requires the C++14 shared_mutex functionality
-#endif
-
-#include <shared_mutex>
-using shared_mutex = std::shared_timed_mutex;
-
 using namespace libguarded;
 
 BOOST_AUTO_TEST_CASE(ordered_guarded_1)
 {
-
-    ordered_guarded<int, shared_mutex> data(0);
+    ordered_guarded<int> data(0);
 
     data.modify([](int &x) { ++x; });
 

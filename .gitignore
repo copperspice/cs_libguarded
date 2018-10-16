@@ -22,3 +22,5 @@ Makefile.in
 /ci/Debug/
 /ci/packages/
 .vs/
+/ci/LibGuarded.v12.suo
+/ci/LibGuarded.vcxproj.user
