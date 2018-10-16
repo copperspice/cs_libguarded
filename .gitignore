@@ -21,3 +21,4 @@ Makefile.in
 /autotools/m4/lt~obsolete.m4
 /ci/Debug/
 /ci/packages/
+.vs/
