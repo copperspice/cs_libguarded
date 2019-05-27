@@ -232,14 +232,14 @@ auto lr_guarded<T, M>::try_lock_shared() const -> shared_handle
 
 template <typename T, typename M>
 template <typename Duration>
-auto lr_guarded<T, M>::try_lock_shared_for(const Duration & duration) const -> shared_handle
+auto lr_guarded<T, M>::try_lock_shared_for(const Duration &) const -> shared_handle
 {
     return lock_shared();
 }
 
 template <typename T, typename M>
 template <typename TimePoint>
-auto lr_guarded<T, M>::try_lock_shared_until(const TimePoint & timepoint) const -> shared_handle
+auto lr_guarded<T, M>::try_lock_shared_until(const TimePoint &) const -> shared_handle
 {
     return lock_shared();
 }
