@@ -101,29 +101,36 @@ class guarded
     handle try_lock_until(const TimePoint &timepoint);
 
   private:
-    class deleter
-    {
-      public:
-        using pointer = T *;
-
-        deleter(std::unique_lock<M> lock) : m_lock(std::move(lock))
-        {
-        }
-
-        void operator()(T *ptr)
-        {
-            if (m_lock.owns_lock()) {
-                m_lock.unlock();
-            }
-        }
-
-      private:
-        std::unique_lock<M> m_lock;
-    };
-
     T m_obj;
     M m_mutex;
 };
+
+template <typename T, typename M>
+class guarded<T, M>::deleter
+{
+  public:
+    using pointer = T *;
+
+    deleter(std::unique_lock<M> lock);
+
+    void operator()(T *ptr);
+
+  private:
+    std::unique_lock<M> m_lock;
+};
+
+template <typename T, typename M>
+guarded<T, M>::deleter::deleter(std::unique_lock<M> lock) : m_lock(std::move(lock))
+{
+}
+
+template <typename T, typename M>
+void guarded<T, M>::deleter::operator()(T *ptr)
+{
+    if (m_lock.owns_lock()) {
+        m_lock.unlock();
+    }
+}
 
 template <typename T, typename M>
 template <typename... Us>
