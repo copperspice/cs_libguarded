@@ -23,7 +23,10 @@ BOOST_AUTO_TEST_CASE(shared_guarded_1)
     {
         auto data_handle = data.lock();
 
-        ++(*data_handle);
+	++(*data_handle);
+
+	data_handle.reset();
+	data_handle = data.lock();
     }
 
     {
