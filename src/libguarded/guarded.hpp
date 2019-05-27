@@ -125,7 +125,7 @@ guarded<T, M>::deleter::deleter(std::unique_lock<M> lock) : m_lock(std::move(loc
 }
 
 template <typename T, typename M>
-void guarded<T, M>::deleter::operator()(T *ptr)
+void guarded<T, M>::deleter::operator()(T *)
 {
     if (m_lock.owns_lock()) {
         m_lock.unlock();
