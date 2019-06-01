@@ -1,3 +1,20 @@
+/***********************************************************************
+*
+* Copyright (c) 2015-2019 Ansel Sermersheim
+*
+* This file is part of libguarded.
+*
+* libguarded is free software, released under the BSD 2-Clause license.
+* For license details refer to LICENSE provided with this project.
+*
+* CopperSpice is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+*
+* https://opensource.org/licenses/BSD-2-Clause
+*
+***********************************************************************/
+
 #include <libguarded/deferred_guarded.hpp>
 
 #include <boost/test/unit_test.hpp>
