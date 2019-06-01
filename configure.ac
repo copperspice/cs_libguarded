@@ -2,7 +2,7 @@ AC_INIT(libguarded, 1.1.0)
 
 AC_CONFIG_AUX_DIR(autotools/build-aux)
 AC_CONFIG_MACRO_DIR([autotools/m4])
-AC_CONFIG_SRCDIR([test/guarded.cpp])
+AC_CONFIG_SRCDIR([test/test_guarded.cpp])
 AM_INIT_AUTOMAKE([foreign])
 
 AC_PROG_CC_C99
