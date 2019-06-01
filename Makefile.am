@@ -27,15 +27,15 @@ check_PROGRAMS=bin/unittest
 bin_unittest_CXXFLAGS=${AM_CXXFLAGS} ${PTHREAD_CFLAGS}
 bin_unittest_LIBS=${PTHREAD_LIBS}
 bin_unittest_SOURCES = \
-	test/cow_guarded.cpp \
-	test/guarded.cpp \
-	test/lr_guarded.cpp \
-	test/rcu_guarded.cpp
+	test/test_cow.cpp \
+	test/test_guarded.cpp \
+	test/test_lr.cpp \
+	test/test_rcu.cpp
 
 if CXX14
 bin_unittest_SOURCES += \
-	test/deferred_guarded.cpp \
-	test/ordered_guarded.cpp \
-	test/shared_guarded.cpp
+	test/test_deferred.cpp \
+	test/test_ordered.cpp \
+	test/test_shared.cpp
 endif
 
