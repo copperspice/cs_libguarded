@@ -188,8 +188,10 @@ class deallocator
 
     void operator()(pointer p)
     {
-        allocator_traits::destroy(alloc, p);
-        allocator_traits::deallocate(alloc, p, 1);
+       if (p != nullptr) {
+          allocator_traits::destroy(alloc, p);
+          allocator_traits::deallocate(alloc, p, 1);
+       }
     }
 };
 
@@ -272,16 +274,22 @@ void rcu_list<T, M, Alloc>::rcu_guard::unlock()
     n = cached_next;
 
     if (last) {
-        while (n) {
-            node *deadNode = n->zombie_node;
+      while (n) {
+         node *deadNode = n->zombie_node;
+
+         if (deadNode != nullptr) {
             node_alloc_trait::destroy(m_list->m_node_alloc, deadNode);
             node_alloc_trait::deallocate(m_list->m_node_alloc, deadNode, 1);
+         }
 
-            zombie_list_node *oldnode = n;
-            n                         = n->next.load();
+         zombie_list_node *oldnode = n;
+         n = n->next.load();
+
+         if (oldnode != nullptr) {
             zombie_alloc_trait::destroy(m_list->m_zombie_alloc, oldnode);
             zombie_alloc_trait::deallocate(m_list->m_zombie_alloc, oldnode, 1);
-        }
+         }
+      }
 
         m_zombie->next.store(n);
     }
@@ -443,7 +451,8 @@ class rcu_list<T, M, Alloc>::const_iterator
   private:
     friend rcu_list<T, M, Alloc>;
 
-    explicit const_iterator(node *n) : m_current(n){};
+    explicit const_iterator(node *n) : m_current(n)
+    {};
 
     node *m_current;
 };
@@ -492,28 +501,34 @@ rcu_list<T, M, Alloc>::rcu_list(const Alloc &alloc) : m_node_alloc(alloc), m_zom
 template <typename T, typename M, typename Alloc>
 rcu_list<T, M, Alloc>::~rcu_list()
 {
-    node *n = m_head.load();
+   node *n = m_head.load();
 
-    while (n != nullptr) {
-        node *current = n;
-        n             = n->next.load();
+   while (n != nullptr) {
+      node *current = n;
+      n = n->next.load();
 
-        node_alloc_trait::destroy(m_node_alloc, current);
-        node_alloc_trait::deallocate(m_node_alloc, current, 1);
-    }
+      if (current != nullptr) {
+         node_alloc_trait::destroy(m_node_alloc, current);
+         node_alloc_trait::deallocate(m_node_alloc, current, 1);
+      }
+   }
 
-    zombie_list_node *zn = m_zombie_head.load();
+   zombie_list_node *zn = m_zombie_head.load();
 
-    while (zn != nullptr && zn->owner.load() == nullptr) {
-        zombie_list_node *current = zn;
-        zn                        = zn->next.load();
+   while (zn != nullptr && zn->owner.load() == nullptr) {
+      zombie_list_node *current = zn;
+      zn = zn->next.load();
 
-        node_alloc_trait::destroy(m_node_alloc, current->zombie_node);
-        node_alloc_trait::deallocate(m_node_alloc, current->zombie_node, 1);
+      if (current->zombie_node != nullptr) {
+         node_alloc_trait::destroy(m_node_alloc, current->zombie_node);
+         node_alloc_trait::deallocate(m_node_alloc, current->zombie_node, 1);
+      }
 
-        zombie_alloc_trait::destroy(m_zombie_alloc, current);
-        zombie_alloc_trait::deallocate(m_zombie_alloc, current, 1);
-    }
+      if (current != nullptr) {
+         zombie_alloc_trait::destroy(m_zombie_alloc, current);
+         zombie_alloc_trait::deallocate(m_zombie_alloc, current, 1);
+      }
+   }
 }
 
 template <typename T, typename M, typename Alloc>
