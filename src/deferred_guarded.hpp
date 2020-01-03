@@ -1,10 +1,10 @@
 /***********************************************************************
 *
-* Copyright (c) 2015-2019 Ansel Sermersheim
+* Copyright (c) 2015-2020 Ansel Sermersheim
 *
-* This file is part of libguarded.
+* This file is part of CsLibGuarded.
 *
-* libguarded is free software, released under the BSD 2-Clause license.
+* CsLibGuarded is free software, released under the BSD 2-Clause license.
 * For license details refer to LICENSE provided with this project.
 *
 * CopperSpice is distributed in the hope that it will be useful,
@@ -18,21 +18,13 @@
 #ifndef LIBGUARDED_DEFERRED_GUARDED_HPP
 #define LIBGUARDED_DEFERRED_GUARDED_HPP
 
-#include <libguarded/guarded.hpp>
+#include <guarded.hpp>
 
 #include <atomic>
 #include <future>
 #include <memory>
 #include <vector>
-
-#if HAVE_CXX14
 #include <shared_mutex>
-#else
-namespace std
-{
-class shared_timed_mutex;
-}
-#endif
 
 namespace libguarded
 {
