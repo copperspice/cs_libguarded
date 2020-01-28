@@ -22,7 +22,7 @@ multiple code reviews, and production software.
 
 Class level documentation for CsLibGuarded is available on the CopperSpice website:
 
-www.copperspice.com/docs/libguarded/index.html
+www.copperspice.com/docs/cs_libguarded/index.html
 
 
 
