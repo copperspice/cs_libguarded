@@ -5,13 +5,13 @@ cmake_policy(VERSION 3.8..3.13)
 # support using rpath on Mac OS X
 cmake_policy(SET CMP0042 NEW)
 
-project(cs_libGuarded)
+project(cs_libguarded)
 
 set(BUILD_MAJOR "1")
 set(BUILD_MINOR "2")
 set(BUILD_MICRO "0")
 
-set(BUILD_COMPONENTS "cs_libGuarded")
+set(BUILD_COMPONENTS "cs_libguarded")
 
 include(CheckCXXCompilerFlag)
 include(CheckCXXSourceCompiles)
@@ -35,16 +35,17 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
 
 endif()
 
-set(PACKAGE           "cs_libGuarded")
+set(PACKAGE           "cs_libguarded")
 set(PACKAGE_NAME      "CsLibGuarded")
 set(PACKAGE_VERSION   "${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_MICRO}")
-set(PACKAGE_STRING    "cs_libGuarded ${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_MICRO}")
-set(PACKAGE_TARNAME   "cs_libGuarded")
+set(PACKAGE_STRING    "cs_libguarded ${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_MICRO}")
+set(PACKAGE_TARNAME   "cs_libguarded")
 set(PACKAGE_BUGREPORT "info@copperspice.com")
 set(PACKAGE_URL       "https://www.copperspice.com/")
 
 set(CPACK_PACKAGE_NAME          ${PROJECT_NAME} )
 set(CPACK_PACKAGE_VENDOR        "CopperSpice")
+set(CPACK_PACKAGE_CONTACT       "info@copperspice.com")
 set(CPACK_PACKAGE_VERSION_MAJOR ${BUILD_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${BUILD_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${BUILD_MICRO})
