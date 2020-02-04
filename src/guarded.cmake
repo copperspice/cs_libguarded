@@ -13,13 +13,14 @@ target_compile_features(
 )
 
 set(CS_LIBGUARDED_INCLUDE
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/test_cow.hpp
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/test_deferred.hpp
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/test_guarded.hpp
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/test_lr.hpp
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/test_ordered.hpp
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/test_rcu.hpp
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/test_shared.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/cow_guarded.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/deferred_guarded.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/guarded.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/lr_guarded.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/ordered_guarded.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/rcu_guarded.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/rcu_list.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/shared_guarded.hpp
 )
 
 install(
