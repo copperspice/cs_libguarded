@@ -15,7 +15,7 @@
 *
 ***********************************************************************/
 
-#include <cow_guarded.hpp>
+#include <cow_guarded.h>
 
 #include <thread>
 

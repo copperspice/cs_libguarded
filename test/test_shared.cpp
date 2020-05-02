@@ -15,7 +15,7 @@
 *
 ***********************************************************************/
 
-#include <shared_guarded.hpp>
+#include <shared_guarded.h>
 
 #include <boost/test/unit_test.hpp>
 

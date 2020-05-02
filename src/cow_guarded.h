@@ -18,7 +18,7 @@
 #ifndef LIBGUARDED_COW_GUARDED_HPP
 #define LIBGUARDED_COW_GUARDED_HPP
 
-#include <lr_guarded.hpp>
+#include <lr_guarded.h>
 
 #include <atomic>
 #include <memory>

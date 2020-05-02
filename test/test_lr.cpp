@@ -15,7 +15,7 @@
 *
 ***********************************************************************/
 
-#include <lr_guarded.hpp>
+#include <lr_guarded.h>
 
 #include <thread>
 

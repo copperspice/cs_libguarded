@@ -15,8 +15,8 @@
 *
 ***********************************************************************/
 
-#include <rcu_guarded.hpp>
-#include <rcu_list.hpp>
+#include <rcu_guarded.h>
+#include <rcu_list.h>
 
 #include <thread>
 #include <iostream>

@@ -15,7 +15,7 @@
 *
 ***********************************************************************/
 
-#include <ordered_guarded.hpp>
+#include <ordered_guarded.h>
 
 #include <boost/test/unit_test.hpp>
 

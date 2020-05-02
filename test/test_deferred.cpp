@@ -15,7 +15,7 @@
 *
 ***********************************************************************/
 
-#include <deferred_guarded.hpp>
+#include <deferred_guarded.h>
 
 #include <boost/test/unit_test.hpp>
 
