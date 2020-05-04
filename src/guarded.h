@@ -132,9 +132,7 @@ guarded<T, M>::deleter::deleter(std::unique_lock<M> lock) : m_lock(std::move(loc
 template <typename T, typename M>
 void guarded<T, M>::deleter::operator()(T *)
 {
-    if (m_lock.owns_lock()) {
-        m_lock.unlock();
-    }
+    m_lock.unlock();
 }
 
 template <typename T, typename M>
@@ -155,11 +153,11 @@ auto guarded<T, M>::try_lock() -> handle
 {
     std::unique_lock<M> lock(m_mutex, std::try_to_lock);
 
-    if (lock.owns_lock()) {
-        return handle(&m_obj, deleter(std::move(lock)));
-    } else {
-        return handle(nullptr, deleter(std::move(lock)));
+    if (!lock.owns_lock()) {
+        return handle(nullptr, std::unique_lock<M>());
     }
+
+    return handle(&m_obj, deleter(std::move(lock)));
 }
 
 template <typename T, typename M>
@@ -168,11 +166,11 @@ auto guarded<T, M>::try_lock_for(const Duration &d) -> handle
 {
     std::unique_lock<M> lock(m_mutex, d);
 
-    if (lock.owns_lock()) {
-        return handle(&m_obj, deleter(std::move(lock)));
-    } else {
-        return handle(nullptr, deleter(std::move(lock)));
+    if (!lock.owns_lock()) {
+        return handle(nullptr, std::unique_lock<M>());
     }
+
+    return handle(&m_obj, deleter(std::move(lock)));
 }
 
 template <typename T, typename M>
@@ -181,11 +179,11 @@ auto guarded<T, M>::try_lock_until(const TimePoint &tp) -> handle
 {
     std::unique_lock<M> lock(m_mutex, tp);
 
-    if (lock.owns_lock()) {
-        return handle(&m_obj, deleter(std::move(lock)));
-    } else {
-        return handle(nullptr, deleter(std::move(lock)));
+    if (!lock.owns_lock()) {
+        return handle(nullptr, std::unique_lock<M>());
     }
+
+    return handle(&m_obj, deleter(std::move(lock)));
 }
 }
 
