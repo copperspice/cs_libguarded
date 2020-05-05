@@ -15,7 +15,7 @@
 *
 ***********************************************************************/
 
-#include <cs_guarded.h>
+#include <cs_plain_guarded.h>
 
 #define BOOST_TEST_MODULE guarded_test
 #include <boost/test/included/unit_test.hpp>
@@ -28,7 +28,7 @@ using namespace libguarded;
 BOOST_AUTO_TEST_CASE(guarded_1)
 {
 
-    guarded<int, std::timed_mutex> data(0);
+    plain_guarded<int, std::timed_mutex> data(0);
 
     {
         auto data_handle = data.lock();
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(guarded_1)
 
 BOOST_AUTO_TEST_CASE(guarded_2)
 {
-    guarded<int> data(0);
+    plain_guarded<int> data(0);
 
     std::thread th1([&data]() {
         for (int i = 0; i < 10000; ++i) {

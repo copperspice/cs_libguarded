@@ -18,7 +18,7 @@
 #ifndef LIBGUARDED_DEFERRED_GUARDED_HPP
 #define LIBGUARDED_DEFERRED_GUARDED_HPP
 
-#include "cs_guarded.h"
+#include "cs_plain_guarded.h"
 
 #include <atomic>
 #include <future>
@@ -99,8 +99,8 @@ class deferred_guarded
     mutable T m_obj;
     mutable M m_mutex;
 
-    mutable std::atomic<bool>                                   m_pendingWrites;
-    mutable guarded<std::vector<std::packaged_task<void(T &)>>> m_pendingList;
+    mutable std::atomic<bool>                                         m_pendingWrites;
+    mutable plain_guarded<std::vector<std::packaged_task<void(T &)>>> m_pendingList;
 };
 
 template <typename T, typename M>

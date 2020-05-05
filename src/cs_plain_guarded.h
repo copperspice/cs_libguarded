@@ -15,8 +15,8 @@
 *
 ***********************************************************************/
 
-#ifndef LIBGUARDED_GUARDED_HPP
-#define LIBGUARDED_GUARDED_HPP
+#ifndef LIBGUARDED_PLAIN_GUARDED_HPP
+#define LIBGUARDED_PLAIN_GUARDED_HPP
 
 #include <memory>
 #include <mutex>
@@ -39,7 +39,7 @@ namespace libguarded
    copyable.
 */
 template <typename T, typename M = std::mutex>
-class guarded
+class plain_guarded
 {
   private:
     class deleter;
@@ -53,7 +53,7 @@ class guarded
      constructor of T.
     */
     template <typename... Us>
-    guarded(Us &&... data);
+    plain_guarded(Us &&... data);
 
     /**
      Acquire a handle to the protected object. As a side effect, the
@@ -111,7 +111,7 @@ class guarded
 };
 
 template <typename T, typename M>
-class guarded<T, M>::deleter
+class plain_guarded<T, M>::deleter
 {
   public:
     using pointer = T *;
@@ -125,12 +125,12 @@ class guarded<T, M>::deleter
 };
 
 template <typename T, typename M>
-guarded<T, M>::deleter::deleter(std::unique_lock<M> lock) : m_lock(std::move(lock))
+plain_guarded<T, M>::deleter::deleter(std::unique_lock<M> lock) : m_lock(std::move(lock))
 {
 }
 
 template <typename T, typename M>
-void guarded<T, M>::deleter::operator()(T *)
+void plain_guarded<T, M>::deleter::operator()(T *)
 {
     if (m_lock.owns_lock()) {
         m_lock.unlock();
@@ -139,19 +139,19 @@ void guarded<T, M>::deleter::operator()(T *)
 
 template <typename T, typename M>
 template <typename... Us>
-guarded<T, M>::guarded(Us &&... data) : m_obj(std::forward<Us>(data)...)
+plain_guarded<T, M>::plain_guarded(Us &&... data) : m_obj(std::forward<Us>(data)...)
 {
 }
 
 template <typename T, typename M>
-auto guarded<T, M>::lock() -> handle
+auto plain_guarded<T, M>::lock() -> handle
 {
     std::unique_lock<M> lock(m_mutex);
     return handle(&m_obj, deleter(std::move(lock)));
 }
 
 template <typename T, typename M>
-auto guarded<T, M>::try_lock() -> handle
+auto plain_guarded<T, M>::try_lock() -> handle
 {
     std::unique_lock<M> lock(m_mutex, std::try_to_lock);
 
@@ -164,7 +164,7 @@ auto guarded<T, M>::try_lock() -> handle
 
 template <typename T, typename M>
 template <typename Duration>
-auto guarded<T, M>::try_lock_for(const Duration &d) -> handle
+auto plain_guarded<T, M>::try_lock_for(const Duration &d) -> handle
 {
     std::unique_lock<M> lock(m_mutex, d);
 
@@ -177,7 +177,7 @@ auto guarded<T, M>::try_lock_for(const Duration &d) -> handle
 
 template <typename T, typename M>
 template <typename TimePoint>
-auto guarded<T, M>::try_lock_until(const TimePoint &tp) -> handle
+auto plain_guarded<T, M>::try_lock_until(const TimePoint &tp) -> handle
 {
     std::unique_lock<M> lock(m_mutex, tp);
 
@@ -187,6 +187,9 @@ auto guarded<T, M>::try_lock_until(const TimePoint &tp) -> handle
         return handle(nullptr, deleter(std::move(lock)));
     }
 }
+
+template <typename T, typename M = std::mutex>
+using guarded [[deprecated("renamed to plain_guarded")]] = plain_guarded<T, M> ;
 }
 
 #endif

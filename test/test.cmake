@@ -17,7 +17,7 @@ if (Boost_UNIT_TEST_FRAMEWORK_FOUND AND Threads_FOUND)
       PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/test/test_cow.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/test/test_deferred.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/test/test_guarded.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/test/test_plain.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/test/test_lr.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ordered.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/test/test_rcu.cpp

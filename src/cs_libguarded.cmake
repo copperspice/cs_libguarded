@@ -16,7 +16,7 @@ target_compile_features(
 set(CS_LIBGUARDED_INCLUDE
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_cow_guarded.h
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_deferred_guarded.h
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_guarded.h
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_plain_guarded.h
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_lr_guarded.h
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_ordered_guarded.h
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_rcu_guarded.h
