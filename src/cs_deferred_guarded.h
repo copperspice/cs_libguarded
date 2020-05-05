@@ -18,7 +18,7 @@
 #ifndef LIBGUARDED_DEFERRED_GUARDED_HPP
 #define LIBGUARDED_DEFERRED_GUARDED_HPP
 
-#include <guarded.h>
+#include "cs_guarded.h"
 
 #include <atomic>
 #include <future>

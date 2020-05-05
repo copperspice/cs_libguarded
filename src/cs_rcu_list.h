@@ -18,7 +18,7 @@
 #ifndef LIBGUARDED_RCU_LIST_HPP
 #define LIBGUARDED_RCU_LIST_HPP
 
-#include <rcu_guarded.h>
+#include "cs_rcu_guarded.h"
 
 #include <atomic>
 #include <cstddef>
