@@ -78,5 +78,5 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 enable_testing()
 
-include(src/guarded.cmake)
+include(src/cs_libguarded.cmake)
 include(test/test.cmake)
