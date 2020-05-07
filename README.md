@@ -2,7 +2,7 @@
 
 ### Introduction
 
-The CsLibGuarded library is a standalone header-only library for multithreaded programming.
+The CsLibGuarded library is a standalone header only library for multithreaded programming.
 
 This library provides templated classes which prevent race conditions by controlling access to shared data. Existing
 multithreading primitives like mutexes and locks are only bound to the protected data by conventions. This makes it
@@ -12,9 +12,9 @@ idea of this library is to tie the data and the locks in a type safe interface t
 
 ### System Requirements
 
-To use CsLibGuarded you will need a C++14 compiler and a C++14 standard library.
+To use CsLibGuarded you will need a C++17 compiler which fully supports the C++17 standard library.
 
-Uses CMake for building and running the unit test suite. The library has been tested with clang thread sanitizer,
+CMake is only for building and running the unit test suite. This library has been tested with clang thread sanitizer,
 multiple code reviews, and production software.
 
 
@@ -28,9 +28,14 @@ www.copperspice.com/docs/cs_libguarded/index.html
 
 ### Presentations
 
-Multiple videos discussing CsLibGuarded and multithreading can be found on the following pages:
+Our YouTube channel contains videos about modern C++, graphics, build systems, CopperSpice, DoxyPress, and other
+topics related to software development.
 
-www.youtube.com/copperspice <br>
+https://www.youtube.com/copperspice
+
+
+Multiple videos discussing CsLibGuarded and multithreading can be found on the following page:
+
 www.copperspice.com/presentations.html
 
 
