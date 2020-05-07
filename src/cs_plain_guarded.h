@@ -15,8 +15,8 @@
 *
 ***********************************************************************/
 
-#ifndef LIBGUARDED_PLAIN_GUARDED_HPP
-#define LIBGUARDED_PLAIN_GUARDED_HPP
+#ifndef CSLIBGUARDED_PLAIN_GUARDED_H
+#define CSLIBGUARDED_PLAIN_GUARDED_H
 
 #include <memory>
 #include <mutex>
@@ -25,7 +25,7 @@ namespace libguarded
 {
 
 /**
-   \headerfile guarded.hpp <libguarded/guarded.hpp>
+   \headerfile cs_plain_guarded.h <CsLibGuarded/cs_plain_guarded.h>
 
    This templated class wraps an object and allows only one thread at a
    time to access the protected object.

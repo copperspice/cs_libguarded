@@ -15,8 +15,8 @@
 *
 ***********************************************************************/
 
-#ifndef LIBGUARDED_ORDERED_GUARDED_HPP
-#define LIBGUARDED_ORDERED_GUARDED_HPP
+#ifndef CSLIBGUARDED_ORDERED_GUARDED_H
+#define CSLIBGUARDED_ORDERED_GUARDED_H
 
 #include <memory>
 #include <mutex>
@@ -27,7 +27,7 @@ namespace libguarded
 {
 
 /**
-   \headerfile ordered_guarded.hpp <libguarded/ordered_guarded.hpp>
+   \headerfile cs_ordered_guarded.h <CsLibGuarded/ordered_guarded.h>
 
    This templated class wraps an object. The protected object may be
    read by any number of threads simultaneously, but only one thread

@@ -15,8 +15,8 @@
 *
 ***********************************************************************/
 
-#ifndef LIBGUARDED_DEFERRED_GUARDED_HPP
-#define LIBGUARDED_DEFERRED_GUARDED_HPP
+#ifndef CSLIBGUARDED_DEFERRED_GUARDED_H
+#define CSLIBGUARDED_DEFERRED_GUARDED_H
 
 #include "cs_plain_guarded.h"
 
@@ -33,7 +33,7 @@ template <class T>
 typename std::add_lvalue_reference<T>::type declref();
 
 /**
-   \headerfile deferred_guarded.hpp <libguarded/deferred_guarded.hpp>
+   \headerfile cs_deferred_guarded.h <CsLibGuarded/cs_deferred_guarded.h>
 
    This templated
    class wraps an object and allows only one thread at a time to

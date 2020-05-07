@@ -15,8 +15,8 @@
 *
 ***********************************************************************/
 
-#ifndef LIBGUARDED_RCU_LIST_HPP
-#define LIBGUARDED_RCU_LIST_HPP
+#ifndef CSLIBGUARDED_RCU_LIST_H
+#define CSLIBGUARDED_RCU_LIST_H
 
 #include "cs_rcu_guarded.h"
 
@@ -29,7 +29,7 @@ namespace libguarded
 {
 
 /**
-   \headerfile rcu_list.hpp <libguarded/rcu_list.hpp>
+   \headerfile cs_rcu_list.h <CsLibGuarded/cs_rcu_list.h>
 
    This templated class implements a linked list which is maintained
    using the RCU algorithm. Only one thread at a time may modify the

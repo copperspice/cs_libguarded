@@ -15,8 +15,8 @@
 *
 ***********************************************************************/
 
-#ifndef LIBGUARDED_LR_GUARDED_HPP
-#define LIBGUARDED_LR_GUARDED_HPP
+#ifndef CSLIBGUARDED_LR_GUARDED_H
+#define CSLIBGUARDED_LR_GUARDED_H
 
 #include <atomic>
 #include <memory>
@@ -27,7 +27,7 @@ namespace libguarded
 {
 
 /**
-   \headerfile lr_guarded.hpp <libguarded/lr_guarded.hpp>
+   \headerfile cs_lr_guarded.h <CsLibGuarded/cs_lr_guarded.h>
 
    This templated class wraps an object and allows only one thread at
    a time to modify the protected object.

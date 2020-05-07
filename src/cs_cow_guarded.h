@@ -15,8 +15,8 @@
 *
 ***********************************************************************/
 
-#ifndef LIBGUARDED_COW_GUARDED_HPP
-#define LIBGUARDED_COW_GUARDED_HPP
+#ifndef CSLIBGUARDED_COW_GUARDED_H
+#define CSLIBGUARDED_COW_GUARDED_H
 
 #include "cs_lr_guarded.h"
 
@@ -28,7 +28,7 @@ namespace libguarded
 {
 
 /**
- \headerfile cow_guarded.hpp <libguarded/cow_guarded.hpp>
+ \headerfile cs_cow_guarded.h <CsLibGuarded/cs_cow_guarded.h>
 
  This templated class wraps an object and allows only one thread at a
  time to modify the protected object. Any number of threads can read
