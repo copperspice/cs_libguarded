@@ -19,22 +19,6 @@ include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(CheckTypeSize)
 
-# file locations for installing
-if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
-   include(GNUInstallDirs)
-   set(CMAKE_INSTALL_RPATH "@executable_path")
-
-elseif(CMAKE_SYSTEM_NAME MATCHES "(Linux|OpenBSD|FreeBSD|NetBSD|DragonFly)")
-   include(GNUInstallDirs)
-   set(CMAKE_INSTALL_RPATH "\$ORIGIN")
-
-elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
-   set(CMAKE_INSTALL_BINDIR bin)
-   set(CMAKE_INSTALL_LIBDIR lib)
-   set(CMAKE_INSTALL_INCLUDEDIR include)
-
-endif()
-
 set(PACKAGE           "cs_libguarded")
 set(PACKAGE_NAME      "CsLibGuarded")
 set(PACKAGE_VERSION   "${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_MICRO}")
