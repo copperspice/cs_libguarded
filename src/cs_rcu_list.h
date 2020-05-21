@@ -80,12 +80,12 @@ class rcu_list
 
     ~rcu_list();
 
-    iterator begin();
-    end_iterator end();
-    const_iterator begin() const;
-    end_iterator end() const;
-    const_iterator cbegin() const;
-    end_iterator cend() const;
+    [[nodiscard]] iterator begin();
+    [[nodiscard]] end_iterator end();
+    [[nodiscard]] const_iterator begin() const;
+    [[nodiscard]] end_iterator end() const;
+    [[nodiscard]] const_iterator cbegin() const;
+    [[nodiscard]] end_iterator cend() const;
 
     void clear();
 

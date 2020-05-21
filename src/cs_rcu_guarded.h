@@ -42,10 +42,10 @@ class rcu_guarded
     rcu_guarded(Us &&... data);
 
     // write access
-    write_handle lock_write();
+    [[nodiscard]] write_handle lock_write();
 
     // read access
-    read_handle lock_read() const;
+    [[nodiscard]] read_handle lock_read() const;
 
     class write_handle
     {

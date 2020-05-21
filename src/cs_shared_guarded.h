@@ -52,24 +52,24 @@ class shared_guarded
     shared_guarded(Us &&... data);
 
     // exclusive access
-    handle lock();
-    handle try_lock();
+    [[nodiscard]] handle lock();
+    [[nodiscard]] handle try_lock();
 
     template <class Duration>
-    handle try_lock_for(const Duration &duration);
+    [[nodiscard]] handle try_lock_for(const Duration &duration);
 
     template <class TimePoint>
-    handle try_lock_until(const TimePoint &timepoint);
+    [[nodiscard]] handle try_lock_until(const TimePoint &timepoint);
 
     // shared access, note "shared" in method names
-    shared_handle lock_shared() const;
-    shared_handle try_lock_shared() const;
+    [[nodiscard]] shared_handle lock_shared() const;
+    [[nodiscard]] shared_handle try_lock_shared() const;
 
     template <class Duration>
-    shared_handle try_lock_shared_for(const Duration &duration) const;
+    [[nodiscard]] shared_handle try_lock_shared_for(const Duration &duration) const;
 
     template <class TimePoint>
-    shared_handle try_lock_shared_until(const TimePoint &timepoint) const;
+    [[nodiscard]] shared_handle try_lock_shared_until(const TimePoint &timepoint) const;
 
   private:
     T m_obj;

@@ -60,16 +60,16 @@ class ordered_guarded
     decltype(auto) modify(Func &&func);
 
     template <typename Func>
-    decltype(auto) read(Func &&func) const;
+    [[nodiscard]] decltype(auto) read(Func &&func) const;
 
-    shared_handle lock_shared() const;
-    shared_handle try_lock_shared() const;
+    [[nodiscard]] shared_handle lock_shared() const;
+    [[nodiscard]] shared_handle try_lock_shared() const;
 
     template <class Duration>
-    shared_handle try_lock_shared_for(const Duration &duration) const;
+    [[nodiscard]] shared_handle try_lock_shared_for(const Duration &duration) const;
 
     template <class TimePoint>
-    shared_handle try_lock_shared_until(const TimePoint &timepoint) const;
+    [[nodiscard]] shared_handle try_lock_shared_until(const TimePoint &timepoint) const;
 
   private:
     class shared_deleter

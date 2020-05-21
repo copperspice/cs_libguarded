@@ -84,27 +84,27 @@ class lr_guarded
      Acquire a shared_handle to the protected object. Always succeeds without
      blocking.
     */
-    shared_handle lock_shared() const;
+    [[nodiscard]] shared_handle lock_shared() const;
 
     /**
      Acquire a shared_handle to the protected object. Always succeeds without
      blocking.
     */
-    shared_handle try_lock_shared() const;
+    [[nodiscard]] shared_handle try_lock_shared() const;
 
     /**
      Acquire a shared_handle to the protected object. Always succeeds without
      blocking.
     */
     template <class Duration>
-    shared_handle try_lock_shared_for(const Duration & duration) const;
+    [[nodiscard]] shared_handle try_lock_shared_for(const Duration & duration) const;
 
     /**
      Acquire a shared_handle to the protected object. Always succeeds without
      blocking.
     */
     template <class TimePoint>
-    shared_handle try_lock_shared_until(const TimePoint & timepoint) const;
+    [[nodiscard]] shared_handle try_lock_shared_until(const TimePoint & timepoint) const;
 
   private:
     class shared_deleter
