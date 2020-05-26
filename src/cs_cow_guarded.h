@@ -239,13 +239,14 @@ auto cow_guarded<T, M>::lock() -> handle
 template <typename T, typename M>
 auto cow_guarded<T, M>::try_lock() -> handle
 {
-    std::unique_lock<M> guard(m_writeMutex);
+    std::unique_lock<M> guard(m_writeMutex, std::try_to_lock);
 
-    auto data(m_data.try_lock_shared());
-
-    if (!data) {
+    if (!guard.owns_lock()) {
         return handle();
     }
+
+    // lr_guarded::lock_shared cannot block or fail
+    auto data(m_data.lock_shared());
 
     std::unique_ptr<T> val(new T(**data));
     data.reset();
@@ -257,12 +258,14 @@ template <typename T, typename M>
 template <typename Duration>
 auto cow_guarded<T, M>::try_lock_for(const Duration &duration) -> handle
 {
-    std::unique_lock<M> guard(m_writeMutex);
-    auto data = m_data.try_lock_shared_for(duration);
+    std::unique_lock<M> guard(m_writeMutex, duration);
 
-    if (!data) {
+    if (!guard.owns_lock()) {
         return handle();
     }
+
+    // lr_guarded::lock_shared cannot block or fail
+    auto data = m_data.lock_shared();
 
     std::unique_ptr<T> val(new T(**data));
     data.reset();
@@ -274,13 +277,14 @@ template <typename T, typename M>
 template <typename TimePoint>
 auto cow_guarded<T, M>::try_lock_until(const TimePoint &timepoint) -> handle
 {
-    std::unique_lock<M> guard(m_writeMutex);
+    std::unique_lock<M> guard(m_writeMutex, timepoint);
 
-    auto data(m_data.try_lock_shared_until(timepoint));
-
-    if (!data) {
+    if (!guard.owns_lock()) {
         return handle();
     }
+
+    // lr_guarded::lock_shared cannot block or fail
+    auto data(m_data.lock_shared());
 
     std::unique_ptr<T> val(new T(**data));
     data.reset();
