@@ -155,8 +155,10 @@ class cow_guarded
       public:
         using pointer = T *;
 
+        deleter() = default;
+
         deleter(std::unique_lock<Mutex> &&lock, cow_guarded &guarded)
-            : m_lock(std::move(lock)), m_guarded(guarded), m_cancelled(false)
+            : m_lock(std::move(lock)), m_guarded(&guarded), m_cancelled(false)
         {
         }
 
@@ -173,10 +175,10 @@ class cow_guarded
         {
             if (m_cancelled) {
                 delete ptr;
-            } else if (ptr) {
+            } else if (ptr && m_guarded) {
                 std::shared_ptr<const T> newPtr(ptr);
 
-                m_guarded.m_data.modify([newPtr](std::shared_ptr<const T> &ptr) { ptr = newPtr; });
+                m_guarded->m_data.modify([newPtr](std::shared_ptr<const T> &ptr) { ptr = newPtr; });
             }
 
             if (m_lock.owns_lock()) {
@@ -186,7 +188,7 @@ class cow_guarded
 
       private:
         std::unique_lock<Mutex> m_lock;
-        cow_guarded &m_guarded;
+        cow_guarded *m_guarded;
         bool m_cancelled;
     };
 
