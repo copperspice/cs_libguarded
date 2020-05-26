@@ -17,7 +17,6 @@
 
 #include <cs_shared_guarded.h>
 
-#include <boost/test/unit_test.hpp>
 
 #include <atomic>
 #include <thread>
@@ -26,9 +25,11 @@
 using shared_mutex = std::shared_timed_mutex;
 namespace chrono   = std::chrono;
 
+#include <catch2/catch.hpp>
+
 using namespace libguarded;
 
-BOOST_AUTO_TEST_CASE(shared_guarded_1)
+TEST_CASE("Shared guarded 1", "[shared_guarded]")
 {
 
     shared_guarded<int, shared_mutex> data(0);
@@ -45,8 +46,8 @@ BOOST_AUTO_TEST_CASE(shared_guarded_1)
     {
         auto data_handle = data.try_lock();
 
-        BOOST_CHECK(data_handle != nullptr);
-        BOOST_CHECK_EQUAL(*data_handle, 1);
+        REQUIRE(data_handle != nullptr);
+        REQUIRE(*data_handle == 1);
 
         /* These tests must be done from another thread, because on
            glibc std::mutex is actually a recursive mutex. */
@@ -78,16 +79,16 @@ BOOST_AUTO_TEST_CASE(shared_guarded_1)
         th2.join();
         th3.join();
 
-        BOOST_CHECK(th1_ok == true);
-        BOOST_CHECK(th2_ok == true);
-        BOOST_CHECK(th3_ok == true);
+        REQUIRE(th1_ok == true);
+        REQUIRE(th2_ok == true);
+        REQUIRE(th3_ok == true);
     }
 
     {
         auto data_handle = data.try_lock();
 
-        BOOST_CHECK(data_handle != nullptr);
-        BOOST_CHECK_EQUAL(*data_handle, 1);
+        REQUIRE(data_handle != nullptr);
+        REQUIRE(*data_handle == 1);
 
         std::atomic<bool> th1_ok(true);
         std::atomic<bool> th2_ok(true);
@@ -116,16 +117,16 @@ BOOST_AUTO_TEST_CASE(shared_guarded_1)
         th2.join();
         th3.join();
 
-        BOOST_CHECK(th1_ok == true);
-        BOOST_CHECK(th2_ok == true);
-        BOOST_CHECK(th3_ok == true);
+        REQUIRE(th1_ok == true);
+        REQUIRE(th2_ok == true);
+        REQUIRE(th3_ok == true);
     }
 
     {
         auto data_handle = data.lock_shared();
 
-        BOOST_CHECK(data_handle != nullptr);
-        BOOST_CHECK_EQUAL(*data_handle, 1);
+        REQUIRE(data_handle != nullptr);
+        REQUIRE(*data_handle == 1);
 
         std::atomic<bool> th1_ok(true);
         std::atomic<bool> th2_ok(true);
@@ -161,13 +162,13 @@ BOOST_AUTO_TEST_CASE(shared_guarded_1)
         th2.join();
         th3.join();
 
-        BOOST_CHECK(th1_ok == true);
-        BOOST_CHECK(th2_ok == true);
-        BOOST_CHECK(th3_ok == true);
+        REQUIRE(th1_ok == true);
+        REQUIRE(th2_ok == true);
+        REQUIRE(th3_ok == true);
     }
 }
 
-BOOST_AUTO_TEST_CASE(shared_guarded_2)
+TEST_CASE("Shared guarded 2", "[shared_guarded]")
 {
     shared_guarded<int, shared_mutex> data(0);
 
@@ -189,7 +190,7 @@ BOOST_AUTO_TEST_CASE(shared_guarded_2)
         int last_val = 0;
         while (last_val != 200000) {
             auto data_handle = data.lock_shared();
-            BOOST_CHECK(last_val <= *data_handle);
+            REQUIRE(last_val <= *data_handle);
             last_val = *data_handle;
         }
     });
@@ -200,5 +201,5 @@ BOOST_AUTO_TEST_CASE(shared_guarded_2)
 
     auto data_handle = data.lock();
 
-    BOOST_CHECK_EQUAL(*data_handle, 200000);
+    REQUIRE(*data_handle == 200000);
 }

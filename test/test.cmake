@@ -1,7 +1,10 @@
-find_package(Boost COMPONENTS unit_test_framework)
+find_package(Catch2)
 find_package(Threads)
 
-if (Boost_UNIT_TEST_FRAMEWORK_FOUND AND Threads_FOUND)
+include(CTest)
+
+if (Catch2_FOUND AND Threads_FOUND)
+
    add_executable(CsLibGuardedTest "")
 
    add_test(unit_test bin/CsLibGuardedTest)
@@ -9,7 +12,7 @@ if (Boost_UNIT_TEST_FRAMEWORK_FOUND AND Threads_FOUND)
    target_link_libraries(CsLibGuardedTest
       PUBLIC
       CsLibGuarded
-      Boost::unit_test_framework
+      Catch2::Catch2
       Threads::Threads
    )
 
@@ -17,10 +20,14 @@ if (Boost_UNIT_TEST_FRAMEWORK_FOUND AND Threads_FOUND)
       PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/test/test_cow.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/test/test_deferred.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/test/test_plain.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/test/test_lock.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/test/test_read_lock.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/test/test_lr.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ordered.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/test/test_rcu.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/test/test_shared.cpp
-   )
+      )
+
+    include(ParseAndAddCatchTests)
+    ParseAndAddCatchTests(CsLibGuardedTest)
 endif()

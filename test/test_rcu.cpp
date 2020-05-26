@@ -21,11 +21,11 @@
 #include <thread>
 #include <iostream>
 
-#include <boost/test/unit_test.hpp>
+#include <catch2/catch.hpp>
 
 using namespace libguarded;
 
-BOOST_AUTO_TEST_CASE(rcu_guarded_1)
+TEST_CASE("RCU guarded 1", "[rcu_guarded]")
 {
     rcu_guarded<rcu_list<int>> my_list;
 
@@ -40,9 +40,9 @@ BOOST_AUTO_TEST_CASE(rcu_guarded_1)
         int count = 0;
         for (auto &item : *h) {
             ++count;
-            BOOST_CHECK_EQUAL(item, 42);
+            REQUIRE(item == 42);
         }
-        BOOST_CHECK_EQUAL(count, 1);
+        REQUIRE(count == 1);
     }
 
     {
@@ -56,9 +56,9 @@ BOOST_AUTO_TEST_CASE(rcu_guarded_1)
         int count = 0;
         for (; iter != rh->end(); ++iter) {
             ++count;
-            BOOST_CHECK_EQUAL(*iter, 42);
+            REQUIRE(*iter == 42);
         }
-        BOOST_CHECK_EQUAL(count, 1);
+        REQUIRE(count == 1);
     }
 
     {
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(rcu_guarded_1)
             escape = item;
             ++count;
         }
-        BOOST_CHECK_EQUAL(count, 0);
+        REQUIRE(count == 0);
     }
 
     {
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE(rcu_guarded_1)
             escape = item;
             ++count;
         }
-        BOOST_CHECK_EQUAL(count, 0);
+        REQUIRE(count == 0);
     }
 }
 
@@ -180,7 +180,7 @@ class mock_allocator {
     }
 };
 
-BOOST_AUTO_TEST_CASE(rcu_guarded_allocator)
+TEST_CASE("RCU guarded 2", "[rcu_guarded]")
 {
     // large value type makes it easy to distinguish nodes from zombies
     // (this avoids any dependency on the private rcu_list node types)
@@ -201,13 +201,13 @@ BOOST_AUTO_TEST_CASE(rcu_guarded_allocator)
 
         // expect 3 allocations, two of which are zombies. just count events,
         // don't make assumptions about ordering
-        BOOST_CHECK_EQUAL(3, log.size());
-        BOOST_CHECK_EQUAL(3, std::count_if(log.begin(), log.end(), is_alloc));
-        BOOST_CHECK_EQUAL(2, std::count_if(log.begin(), log.end(), is_zombie));
+        REQUIRE(3 == log.size());
+        REQUIRE(3 == std::count_if(log.begin(), log.end(), is_alloc));
+        REQUIRE(2 == std::count_if(log.begin(), log.end(), is_zombie));
     }
 
     // expects 3 new deallocations, two of which are zombies
-    BOOST_CHECK_EQUAL(6, log.size());
-    BOOST_CHECK_EQUAL(3, std::count_if(log.begin(), log.end(), is_alloc));
-    BOOST_CHECK_EQUAL(4, std::count_if(log.begin(), log.end(), is_zombie));
+    REQUIRE(6 == log.size());
+    REQUIRE(3 == std::count_if(log.begin(), log.end(), is_alloc));
+    REQUIRE(4 == std::count_if(log.begin(), log.end(), is_zombie));
 }
