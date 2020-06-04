@@ -26,8 +26,8 @@ if (Catch2_FOUND AND Threads_FOUND)
       ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ordered.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/test/test_rcu.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/test/test_shared.cpp
-      )
+   )
 
-    include(ParseAndAddCatchTests)
-    ParseAndAddCatchTests(CsLibGuardedTest)
+   include(ParseAndAddCatchTests)
+   ParseAndAddCatchTests(CsLibGuardedTest)
 endif()

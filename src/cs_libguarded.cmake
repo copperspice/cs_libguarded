@@ -43,4 +43,4 @@ install(
    EXPORT CsLibGuarded-export
    FILE CsLibGuarded.cmake
    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CsLibGuarded
-   )
+)
