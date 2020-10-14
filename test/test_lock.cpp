@@ -28,8 +28,8 @@
 
 using namespace libguarded;
 
-TEMPLATE_TEST_CASE("exclusive lock basic", "[exclusive_lock]", guarded<int>,
-                   shared_guarded<int>, cow_guarded<int>)
+TEMPLATE_TEST_CASE("exclusive lock basic", "[exclusive_lock]", plain_guarded<int>,
+		shared_guarded<int>, cow_guarded<int>)
 {
    SECTION("initialize")
    {
