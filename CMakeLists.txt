@@ -13,6 +13,8 @@ set(BUILD_MAJOR "1")
 set(BUILD_MINOR "2")
 set(BUILD_MICRO "0")
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+
 set(BUILD_COMPONENTS "cs_libguarded")
 
 include(CheckCXXCompilerFlag)
@@ -20,6 +22,7 @@ include(CheckCXXSourceCompiles)
 include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(CheckTypeSize)
+include(FeatureSummary)
 
 set(PACKAGE           "cs_libguarded")
 set(PACKAGE_NAME      "CsLibGuarded")
