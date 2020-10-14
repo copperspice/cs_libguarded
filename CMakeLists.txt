@@ -7,6 +7,8 @@ cmake_policy(SET CMP0042 NEW)
 
 project(cs_libguarded)
 
+option(BUILD_TESTS "Enables building the Catch2 unit tests" OFF)
+
 set(BUILD_MAJOR "1")
 set(BUILD_MINOR "2")
 set(BUILD_MICRO "0")
@@ -61,4 +63,8 @@ endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 include(src/cs_libguarded.cmake)
-include(test/test.cmake)
+
+if(BUILD_TESTS)
+  enable_testing()
+  add_subdirectory(test)
+endif()
