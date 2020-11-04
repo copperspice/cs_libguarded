@@ -24,6 +24,21 @@ include(CheckIncludeFiles)
 include(CheckTypeSize)
 include(FeatureSummary)
 
+# location for install or package
+if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
+   include(GNUInstallDirs)
+
+elseif (CMAKE_SYSTEM_NAME MATCHES "(Linux|OpenBSD|FreeBSD|NetBSD|DragonFly)")
+   include(GNUInstallDirs)
+
+elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
+   set(CMAKE_INSTALL_BINDIR bin)
+   set(CMAKE_INSTALL_LIBDIR lib)
+   set(CMAKE_INSTALL_INCLUDEDIR include)
+
+endif()
+
+
 set(PACKAGE           "cs_libguarded")
 set(PACKAGE_NAME      "CsLibGuarded")
 set(PACKAGE_VERSION   "${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_MICRO}")
@@ -62,12 +77,26 @@ else()
     set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -Wl,--no-undefined")
 endif()
 
+if (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    set(PKG_PREFIX "cmake/CsLibGuarded")
+
+else()
+    set(PKG_PREFIX "${CMAKE_INSTALL_LIBDIR}/cmake/CsLibGuarded")
+
+endif()
+
 # location for building binary files
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 include(src/cs_libguarded.cmake)
 
+
 if(BUILD_TESTS)
   enable_testing()
   add_subdirectory(test)
 endif()
+
+message("")
+message("CsLibGuarded will be built in:      ${CMAKE_BINARY_DIR}")
+message("CsLibGuarded will be installed in:  ${CMAKE_INSTALL_PREFIX}")
+message("\n")

@@ -14,7 +14,7 @@ target_compile_features(
    cxx_std_17
 )
 
-set(CS_LIBGUARDED_INCLUDE
+list(APPEND CS_LIBGUARDED_INCLUDES
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_cow_guarded.h
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_deferred_guarded.h
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_plain_guarded.h
@@ -27,7 +27,7 @@ set(CS_LIBGUARDED_INCLUDE
 
 
 install(
-   FILES ${CS_LIBGUARDED_INCLUDE}
+   FILES ${CS_LIBGUARDED_INCLUDES}
    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/CsLibGuarded
    COMPONENT CsLibGuarded
 )
@@ -42,5 +42,5 @@ install(
 install(
    EXPORT CsLibGuarded-export
    FILE CsLibGuarded.cmake
-   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CsLibGuarded
+   DESTINATION ${PKG_PREFIX}
 )
