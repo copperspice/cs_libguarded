@@ -1,19 +1,19 @@
 /***********************************************************************
- *
- * Copyright (c) 2015-2020 Ansel Sermersheim
- *
- * This file is part of CsLibGuarded.
- *
- * CsLibGuarded is free software, released under the BSD 2-Clause license.
- * For license details refer to LICENSE provided with this project.
- *
- * CopperSpice is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *
- * https://opensource.org/licenses/BSD-2-Clause
- *
- ***********************************************************************/
+*
+* Copyright (c) 2016-2021 Ansel Sermersheim
+*
+* This file is part of CsLibGuarded.
+*
+* CsLibGuarded is free software, released under the BSD 2-Clause license.
+* For license details refer to LICENSE provided with this project.
+*
+* CopperSpice is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+*
+* https://opensource.org/licenses/BSD-2-Clause
+*
+***********************************************************************/
 
 #include <cs_cow_guarded.h>
 #include <cs_plain_guarded.h>
