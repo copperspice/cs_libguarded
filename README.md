@@ -25,11 +25,10 @@ Class level documentation for CsLibGuarded is available on the CopperSpice websi
 www.copperspice.com/docs/cs_libguarded/index.html
 
 
-
 ### Presentations
 
-Our YouTube channel contains videos about modern C++, graphics, build systems, CopperSpice, DoxyPress, and other
-topics related to software development.
+Our YouTube channel contains videos about modern C++, multithreading, graphics, build systems, CopperSpice, DoxyPress,
+and other topics related to software development.
 
 https://www.youtube.com/copperspice
 
@@ -51,8 +50,8 @@ www.copperspice.com/presentations.html
 
 ### License
 
-This library is released under the BSD 2-clause license. For more information refer to the LICENSE file provided with this
-project.
+This library is released under the BSD 2-clause license. For more information refer to the LICENSE file provided with
+this project.
 
 
 ### References
