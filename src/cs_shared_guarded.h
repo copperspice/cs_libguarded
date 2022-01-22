@@ -19,6 +19,7 @@
 #define CSLIBGUARDED_SHARED_GUARDED_H
 
 #include <memory>
+#include <mutex>
 #include <shared_mutex>
 
 namespace libguarded
