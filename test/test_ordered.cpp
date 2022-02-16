@@ -27,6 +27,18 @@ using shared_mutex = std::shared_timed_mutex;
 
 using namespace libguarded;
 
+TEST_CASE("Ordered traits", "[ordered_guarded]")
+{
+   using TestType = ordered_guarded<int, shared_mutex>;
+
+   REQUIRE(std::is_default_constructible_v<TestType> == true);
+   REQUIRE(std::is_constructible_v<TestType, int> == true);
+   REQUIRE(std::is_default_constructible_v<typename TestType::shared_handle> == true);
+   REQUIRE(std::is_move_constructible_v<typename TestType::shared_handle> == true);
+   REQUIRE(std::is_move_assignable_v<typename TestType::shared_handle> == true);
+}
+
+
 TEST_CASE("Ordered guarded 1", "[ordered_guarded]")
 {
    ordered_guarded<int, shared_mutex> data(0);

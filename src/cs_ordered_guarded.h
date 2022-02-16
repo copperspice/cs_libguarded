@@ -77,19 +77,21 @@ class ordered_guarded
          public:
             using pointer = const T *;
 
+            shared_deleter() : m_deleter_mutex(nullptr) {}
+
             shared_deleter(M &mutex)
-               : m_deleter_mutex(mutex)
+               : m_deleter_mutex(&mutex)
             {
             }
 
             void operator()(const T *ptr) {
-               if (ptr) {
-                  m_deleter_mutex.unlock_shared();
+               if (ptr && m_deleter_mutex) {
+                  m_deleter_mutex->unlock_shared();
                }
             }
 
          private:
-            M &m_deleter_mutex;
+            M *m_deleter_mutex;
       };
 
       T m_obj;

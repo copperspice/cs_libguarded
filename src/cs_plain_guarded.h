@@ -116,6 +116,7 @@ class plain_guarded<T, M>::deleter
    public:
       using pointer = T *;
 
+      deleter() = default;
       deleter(std::unique_lock<M> lock);
 
       void operator()(T *ptr);

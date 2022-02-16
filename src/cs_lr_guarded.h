@@ -106,22 +106,35 @@ class lr_guarded
          public:
             using pointer = const T *;
 
+            shared_deleter() : m_readingCount(nullptr) {}
+
             shared_deleter(const shared_deleter &) = delete;
-            shared_deleter(shared_deleter &&)      = default;
+            shared_deleter& operator=(const shared_deleter&) = delete;
+
+	    shared_deleter(shared_deleter && other)
+	       : m_readingCount(other.m_readingCount)
+	    {
+	       other.m_readingCount = nullptr;
+	    }
+
+	    shared_deleter& operator=(shared_deleter&& other) & {
+	       m_readingCount = other.m_readingCount;
+	       other.m_readingCount = nullptr;
+	    }
 
             shared_deleter(std::atomic<int> & readingCount)
-               : m_readingCount(readingCount)
+               : m_readingCount(&readingCount)
             {
             }
 
             void operator()(const T * ptr) {
-               if (ptr) {
-                  m_readingCount--;
+               if (ptr && m_readingCount) {
+                  (*m_readingCount)--;
                }
             }
 
          private:
-            std::atomic<int> & m_readingCount;
+            std::atomic<int> * m_readingCount;
       };
 
       T                        m_left;

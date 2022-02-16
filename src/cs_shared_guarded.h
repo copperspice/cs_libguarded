@@ -83,6 +83,7 @@ class shared_guarded<T, M, L>::deleter
    public:
       using pointer = T *;
 
+      deleter() = default;
       deleter(std::unique_lock<M> lock);
 
       void operator()(T *ptr);
@@ -111,6 +112,7 @@ class shared_guarded<T, M, L>::shared_deleter
 public:
    using pointer = const T *;
 
+   shared_deleter() = default;
    shared_deleter(L lock);
 
    void operator()(const T *ptr);

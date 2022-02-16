@@ -23,6 +23,17 @@
 
 using namespace libguarded;
 
+TEST_CASE("LR traits", "[lr_guarded]")
+{
+   using TestType = lr_guarded<int, std::timed_mutex>;
+
+   REQUIRE(std::is_default_constructible_v<TestType> == true);
+   REQUIRE(std::is_constructible_v<TestType, int> == true);
+   REQUIRE(std::is_default_constructible_v<typename TestType::shared_handle> == true);
+   REQUIRE(std::is_move_constructible_v<typename TestType::shared_handle> == true);
+   REQUIRE(std::is_move_assignable_v<typename TestType::shared_handle> == true);
+}
+
 TEST_CASE("LR guarded 1", "[lr_guarded]")
 {
    lr_guarded<int, std::timed_mutex> data(0);

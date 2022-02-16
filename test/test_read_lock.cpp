@@ -27,6 +27,14 @@
 
 using namespace libguarded;
 
+TEMPLATE_TEST_CASE("read lock traits", "[read_lock]",
+		shared_guarded<int>, cow_guarded<int>)
+{
+   REQUIRE(std::is_default_constructible_v<typename TestType::shared_handle> == true);
+   REQUIRE(std::is_move_constructible_v<typename TestType::shared_handle> == true);
+   REQUIRE(std::is_move_assignable_v<typename TestType::shared_handle> == true);
+}
+
 TEMPLATE_TEST_CASE("read lock basic", "[read_lock]", shared_guarded<int>, cow_guarded<int>)
 {
    SECTION("test multiple read lock")

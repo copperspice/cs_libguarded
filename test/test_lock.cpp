@@ -28,6 +28,16 @@
 
 using namespace libguarded;
 
+TEMPLATE_TEST_CASE("exclusive lock traits", "[exclusive_lock]", plain_guarded<int>,
+		shared_guarded<int>, cow_guarded<int>)
+{
+   REQUIRE(std::is_default_constructible_v<TestType> == true);
+   REQUIRE(std::is_constructible_v<TestType, int> == true);
+   REQUIRE(std::is_default_constructible_v<typename TestType::handle> == true);
+   REQUIRE(std::is_move_constructible_v<typename TestType::handle> == true);
+   REQUIRE(std::is_move_assignable_v<typename TestType::handle> == true);
+}
+
 TEMPLATE_TEST_CASE("exclusive lock basic", "[exclusive_lock]", plain_guarded<int>,
 		shared_guarded<int>, cow_guarded<int>)
 {
