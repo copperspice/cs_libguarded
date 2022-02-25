@@ -18,6 +18,7 @@
 #include <cs_cow_guarded.h>
 #include <cs_plain_guarded.h>
 #include <cs_shared_guarded.h>
+#include <cs_lock_guards.h>
 #include <mutex>
 
 #define CATCH_CONFIG_MAIN
@@ -127,4 +128,32 @@ TEMPLATE_TEST_CASE("exclusive try_lock", "[exclusive_lock]", (plain_guarded<int,
    REQUIRE(th1_ok == true);
    REQUIRE(th2_ok == true);
    REQUIRE(th3_ok == true);
+}
+
+
+TEST_CASE("lock basic", "[lock]")
+{
+   shared_guarded<int> var1(5);
+   plain_guarded<bool> var2(false);
+
+   {
+      auto [lock1, lock2] = lock_guards(var1, var2);
+
+      REQUIRE(std::is_same_v<std::decay_t<decltype(lock1)>, shared_guarded<int>::handle> == true);
+      REQUIRE(std::is_same_v<std::decay_t<decltype(lock2)>, plain_guarded<bool>::handle> == true);
+      
+      REQUIRE(*lock1 == 5);
+      REQUIRE(*lock2 == false);
+      *lock1 = 10;
+      *lock2 = true;
+   }
+   {
+      auto [lock1, lock2] = lock_guards(as_reader(var1), var2);
+
+      REQUIRE(std::is_same_v<std::decay_t<decltype(lock1)>, shared_guarded<int>::shared_handle> == true);
+      REQUIRE(std::is_same_v<std::decay_t<decltype(lock2)>, plain_guarded<bool>::handle> == true);
+
+      REQUIRE(*lock1 == 10);
+      REQUIRE(*lock2 == true);
+   }
 }
