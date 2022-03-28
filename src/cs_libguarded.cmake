@@ -18,7 +18,7 @@ list(APPEND CS_LIBGUARDED_INCLUDES
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_cow_guarded.h
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_deferred_guarded.h
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_plain_guarded.h
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_lock_guard.h
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_lock_guards.h
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_lr_guarded.h
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_ordered_guarded.h
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_rcu_guarded.h
