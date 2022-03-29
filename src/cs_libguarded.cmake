@@ -1,17 +1,17 @@
 add_library(CsLibGuarded INTERFACE)
 
+target_compile_features(
+   CsLibGuarded
+   INTERFACE
+   cxx_std_17
+)
+
 target_include_directories(
    CsLibGuarded
    INTERFACE
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/CsLibGuarded>
    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-)
-
-target_compile_features(
-   CsLibGuarded
-   INTERFACE
-   cxx_std_17
 )
 
 list(APPEND CS_LIBGUARDED_INCLUDES
@@ -25,7 +25,6 @@ list(APPEND CS_LIBGUARDED_INCLUDES
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_rcu_list.h
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_shared_guarded.h
 )
-
 
 install(
    FILES ${CS_LIBGUARDED_INCLUDES}
