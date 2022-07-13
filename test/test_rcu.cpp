@@ -106,6 +106,19 @@ TEST_CASE("RCU guarded 1", "[rcu_guarded]")
                for (int i = 0; i < 2; ++i) {
                   wh->emplace_back(i);
                   wh->emplace_front(i - 1);
+                  wh->emplace(wh->begin(), i);
+                  auto iter = wh->begin();
+
+                  for(int count = 0; count < 500; ++count) {
+                     auto last = iter;
+                     ++iter;
+                     if(iter == wh->end()) {
+                        wh->emplace(last, i - 50);
+                        break;
+                     }
+                  }
+
+                  wh->emplace(++(wh->begin()), i);
                   wh->push_back(i + 4);
                   wh->push_front(i - 7);
                }
