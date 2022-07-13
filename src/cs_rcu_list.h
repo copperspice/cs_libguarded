@@ -555,6 +555,48 @@ auto rcu_list<T, M, Alloc>::end() const -> end_iterator
 }
 
 template <typename T, typename M, typename Alloc>
+template <typename... Us>
+auto rcu_list<T, M, Alloc>::emplace(const_iterator iter, Us &&...vs) -> iterator
+{
+   auto newNode = detail::allocate_unique<node>(m_node_alloc, std::forward<Us>(vs)...);
+
+   node *oldHead = m_head.load();
+   node *oldTail = m_tail.load();
+
+   if (oldHead == nullptr) {
+      // inserting into an empty list
+      m_head.store(newNode.get());
+      m_tail.store(newNode.get());
+
+   } else if (oldHead == iter.m_current) {
+      // inserting at the beginning of a non-empty list
+      newNode->next.store(oldHead);
+      oldHead->back.store(newNode.get());
+      m_head.store(newNode.get());
+
+   } else if (oldTail == iter.m_current) {
+      // inserting at the end of a non-empty list
+      newNode->back.store(oldTail);
+      oldTail->next.store(newNode.get());
+      m_tail.store(newNode.get());
+
+   } else {
+      // inserting in the middle of a non-empty list
+      node *oldBack = iter.m_current->back.load();
+
+      newNode->next.store(iter.m_current);
+      newNode->back.store(oldBack);
+      iter.m_current->back.store(newNode.get());
+
+      if (oldBack != nullptr) {
+         oldBack->next.store(newNode.get());
+      }
+   }
+
+   return iterator(newNode.release());
+}
+
+template <typename T, typename M, typename Alloc>
 void rcu_list<T, M, Alloc>::push_front(T data)
 {
    auto newNode = detail::allocate_unique<node>(m_node_alloc, std::move(data));
