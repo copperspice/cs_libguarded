@@ -27,16 +27,15 @@ www.copperspice.com/docs/cs_libguarded/index.html
 
 ### Presentations
 
-Our YouTube channel contains videos about modern C++, multithreading, graphics, build systems, CopperSpice, DoxyPress,
-and other topics related to software development.
+Our YouTube channel contains over 65 videos about C++, programming fundamentals, Unicode/Strings, multithreading,
+graphics, CopperSpice, DoxyPress, and other software development topics.
 
 https://www.youtube.com/copperspice
 
 
-Multiple videos discussing CsLibGuarded and multithreading can be found on the following page:
+Links to additional vidoes can be found on our website.
 
-www.copperspice.com/presentations.html
-
+https://www.copperspice.com/presentations.html
 
 
 ### Authors / Contributors
@@ -56,5 +55,11 @@ this project.
 
 ### References
 
-* Website: www.copperspice.com
-* Email:   info@copperspice.com
+* Website:  https://www.copperspice.com
+* Twitter:  https://twitter.com/copperspice_cpp
+* Email:    info@copperspice.com
+
+* Github:   https://github.com/copperspice
+
+* Forum:    https://forum.copperspice.com
+* Journal:  https://journal.copperspice.com
