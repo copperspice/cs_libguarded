@@ -1,20 +1,19 @@
 add_library(CsLibGuarded INTERFACE)
+add_library(CsLibGuarded::CsLibGuarded ALIAS CsLibGuarded)
 
-target_compile_features(
-   CsLibGuarded
+target_compile_features(CsLibGuarded
    INTERFACE
    cxx_std_17
 )
 
-target_include_directories(
-   CsLibGuarded
+target_include_directories(CsLibGuarded
    INTERFACE
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/CsLibGuarded>
    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-list(APPEND CS_LIBGUARDED_INCLUDES
+set(CS_LIBGUARDED_INCLUDES
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_cow_guarded.h
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_deferred_guarded.h
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_plain_guarded.h
@@ -26,6 +25,13 @@ list(APPEND CS_LIBGUARDED_INCLUDES
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_shared_guarded.h
 )
 
+
+install(
+   TARGETS CsLibGuarded
+   EXPORT CsLibGuardedLibraryTargets ${INSTALL_TARGETS_DEFAULT_ARGS}
+   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
 install(
    FILES ${CS_LIBGUARDED_INCLUDES}
    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/CsLibGuarded
@@ -33,14 +39,7 @@ install(
 )
 
 install(
-   TARGETS CsLibGuarded
-   EXPORT CsLibGuarded-export
-   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-   COMPONENT CsLibGuarded
-)
-
-install(
-   EXPORT CsLibGuarded-export
-   FILE CsLibGuarded.cmake
+   EXPORT CsLibGuardedLibraryTargets
+   FILE CsLibGuardedLibraryTargets.cmake
    DESTINATION ${PKG_PREFIX}
 )

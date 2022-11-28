@@ -1,15 +1,15 @@
 # ***********************************************************************
 #
-# Copyright (c) 2012-2020 Barbara Geller
-# Copyright (c) 2012-2020 Ansel Sermersheim
+# Copyright (c) 2016-2022 Barbara Geller
+# Copyright (c) 2016-2022 Ansel Sermersheim
 #
-# This file is part of CopperSpice.
+# This file is part of CsLibGuarded.
 #
-# CopperSpice is free software. You can redistribute it and/or
+# CsLibGuarded is free software. You can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public License
 # version 2.1 as published by the Free Software Foundation.
 #
-# CopperSpice is distributed in the hope that it will be useful,
+# CsLibGuarded is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
@@ -19,14 +19,7 @@
 
 find_package(Catch2 QUIET)
 
-set_package_properties(Catch2 PROPERTIES
-   PURPOSE "Required for Catch Unit Tests"
-   DESCRIPTION "Unit test framework"
-   URL "https://github.com/catchorg/Catch2"
-   TYPE RECOMMENDED
-)
-
 if (NOT TARGET Catch2::Catch2)
-   message(STATUS "Catch2 was not found, CopperSpice unit tests will not be built\n")
+   message(STATUS "Catch2 was not found, CsLibGuarded unit tests will not be built\n")
    return()
 endif()

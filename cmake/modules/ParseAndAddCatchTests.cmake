@@ -95,12 +95,19 @@ function(ParseAndAddCatchTests_ParseFile SourceFile TestTarget)
         ParseAndAddCatchTests_PrintDebugMessage("Detected OBJECT library: ${SourceFile} this will not be scanned for tests.")
         return()
     endif()
+
     # According to CMake docs EXISTS behavior is well-defined only for full paths.
     get_filename_component(SourceFile ${SourceFile} ABSOLUTE)
     if(NOT EXISTS ${SourceFile})
-        message(WARNING "Cannot find source file: ${SourceFile}")
+        get_property(isGenerated SOURCE ${SourceFile} PROPERTY GENERATED)
+
+        if(NOT isGenerated)
+           message(WARNING "Cannot find source file: ${SourceFile}")
+        endif()
+
         return()
     endif()
+
     ParseAndAddCatchTests_PrintDebugMessage("parsing ${SourceFile}")
     file(STRINGS ${SourceFile} Contents NEWLINE_CONSUME)
 
@@ -203,7 +210,10 @@ function(ParseAndAddCatchTests_ParseFile SourceFile TestTarget)
 	    endif()
 
             # Add the test and set its properties
-            add_test(NAME "${CTestName}" COMMAND ${OptionalCatchTestLauncher} $<TARGET_FILE:${TestTarget}> ${Name} ${AdditionalCatchParameters})
+            add_test(NAME "${CTestName}"
+               WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+               COMMAND ${OptionalCatchTestLauncher} $<TARGET_FILE:${TestTarget}> ${Name} ${AdditionalCatchParameters})
+
             # Old CMake versions do not document VERSION_GREATER_EQUAL, so we use VERSION_GREATER with 3.8 instead
             if(PARSE_CATCH_TESTS_NO_HIDDEN_TESTS AND ${HiddenTagFound} AND ${CMAKE_VERSION} VERSION_GREATER "3.8")
                 ParseAndAddCatchTests_PrintDebugMessage("Setting DISABLED test property")
