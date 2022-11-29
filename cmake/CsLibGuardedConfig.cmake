@@ -27,5 +27,8 @@ get_filename_component(CsLibGuarded_PREFIX ${CsLibGuarded_CMAKE_DIR}/ ABSOLUTE)
 # library dependencies (contains definitions for imported targets)
 include("${CsLibGuarded_CMAKE_DIR}/CsLibGuardedLibraryTargets.cmake")
 
-# imported targets  INCLUDE_DIRECTORIES
-get_target_property(CsLibGuarded_INCLUDES  CsLibGuarded INTERFACE_INCLUDE_DIRECTORIES)
+# imported targets INCLUDE_DIRECTORIES
+get_target_property(CsLibGuarded_INCLUDES CsLibGuarded::CsLibGuarded INTERFACE_INCLUDE_DIRECTORIES)
+
+# export include base dir, imported in other projects
+set(CsLibGuarded_INCLUDE_DIR  "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@/CsLibGuarded")

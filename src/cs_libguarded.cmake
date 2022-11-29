@@ -25,7 +25,6 @@ set(CS_LIBGUARDED_INCLUDES
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_shared_guarded.h
 )
 
-
 install(
    TARGETS CsLibGuarded
    EXPORT CsLibGuardedLibraryTargets ${INSTALL_TARGETS_DEFAULT_ARGS}
@@ -40,6 +39,7 @@ install(
 
 install(
    EXPORT CsLibGuardedLibraryTargets
+   NAMESPACE CsLibGuarded::
    FILE CsLibGuardedLibraryTargets.cmake
    DESTINATION ${PKG_PREFIX}
 )
