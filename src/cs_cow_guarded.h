@@ -1,13 +1,13 @@
 /***********************************************************************
 *
-* Copyright (c) 2016-2022 Ansel Sermersheim
+* Copyright (c) 2016-2023 Ansel Sermersheim
 *
 * This file is part of CsLibGuarded.
 *
 * CsLibGuarded is free software, released under the BSD 2-Clause license.
 * For license details refer to LICENSE provided with this project.
 *
-* CopperSpice is distributed in the hope that it will be useful,
+* CsLibGuarded is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *
