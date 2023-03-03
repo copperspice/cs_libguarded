@@ -43,9 +43,11 @@ class plain_guarded
 {
    private:
       class deleter;
+      class const_deleter;
 
    public:
-      using handle = std::unique_ptr<T, deleter>;
+      using handle       = std::unique_ptr<T, deleter>;
+      using const_handle = std::unique_ptr<const T, const_deleter>;
 
       /**
         Construct a guarded object. This constructor will accept any
@@ -62,6 +64,7 @@ class plain_guarded
         is destroyed.
        */
       [[nodiscard]] handle lock();
+      [[nodiscard]] const_handle lock() const;
 
       /**
         Attempt to acquire a handle to the protected object. Returns a
@@ -71,6 +74,7 @@ class plain_guarded
         is destroyed.
        */
       [[nodiscard]] handle try_lock();
+      [[nodiscard]] const_handle try_lock() const;
 
       /**
         Attempt to acquire a handle to the protected object. As a side
@@ -88,6 +92,8 @@ class plain_guarded
        */
       template <class Duration>
       [[nodiscard]] handle try_lock_for(const Duration &duration);
+      template <class Duration>
+      [[nodiscard]] const_handle try_lock_for(const Duration &duration) const;
 
       /**
         Attempt to acquire a handle to the protected object.  As a side
@@ -104,10 +110,12 @@ class plain_guarded
        */
       template <class TimePoint>
       [[nodiscard]] handle try_lock_until(const TimePoint &timepoint);
+      template <class TimePoint>
+      [[nodiscard]] const_handle try_lock_until(const TimePoint &timepoint) const;
 
    private:
       T m_obj;
-      M m_mutex;
+      mutable M m_mutex;
 };
 
 template <typename T, typename M>
@@ -140,6 +148,35 @@ void plain_guarded<T, M>::deleter::operator()(T *)
 }
 
 template <typename T, typename M>
+class plain_guarded<T, M>::const_deleter
+{
+   public:
+      using pointer = const T *;
+
+      const_deleter() = default;
+      const_deleter(std::unique_lock<M> lock);
+
+      void operator()(const T *ptr);
+
+   private:
+      std::unique_lock<M> m_lock;
+};
+
+template <typename T, typename M>
+plain_guarded<T, M>::const_deleter::const_deleter(std::unique_lock<M> lock)
+   : m_lock(std::move(lock))
+{
+}
+
+template <typename T, typename M>
+void plain_guarded<T, M>::const_deleter::operator()(const T *)
+{
+   if (m_lock.owns_lock()) {
+      m_lock.unlock();
+   }
+}
+
+template <typename T, typename M>
 template <typename... Us>
 plain_guarded<T, M>::plain_guarded(Us &&... data)
    : m_obj(std::forward<Us>(data)...)
@@ -154,6 +191,13 @@ auto plain_guarded<T, M>::lock() -> handle
 }
 
 template <typename T, typename M>
+auto plain_guarded<T, M>::lock() const -> const_handle
+{
+   std::unique_lock<M> lock(m_mutex);
+   return const_handle(&m_obj, const_deleter(std::move(lock)));
+}
+
+template <typename T, typename M>
 auto plain_guarded<T, M>::try_lock() -> handle
 {
    std::unique_lock<M> lock(m_mutex, std::try_to_lock);
@@ -162,6 +206,18 @@ auto plain_guarded<T, M>::try_lock() -> handle
       return handle(&m_obj, deleter(std::move(lock)));
    } else {
       return handle(nullptr, deleter(std::move(lock)));
+   }
+}
+
+template <typename T, typename M>
+auto plain_guarded<T, M>::try_lock() const -> const_handle
+{
+   std::unique_lock<M> lock(m_mutex, std::try_to_lock);
+
+   if (lock.owns_lock()) {
+      return const_handle(&m_obj, const_deleter(std::move(lock)));
+   } else {
+      return const_handle(nullptr, const_deleter(std::move(lock)));
    }
 }
 
@@ -179,6 +235,19 @@ auto plain_guarded<T, M>::try_lock_for(const Duration &d) -> handle
 }
 
 template <typename T, typename M>
+template <typename Duration>
+auto plain_guarded<T, M>::try_lock_for(const Duration &d) const -> const_handle
+{
+   std::unique_lock<M> lock(m_mutex, d);
+
+   if (lock.owns_lock()) {
+      return const_handle(&m_obj, const_deleter(std::move(lock)));
+   } else {
+      return const_handle(nullptr, const_deleter(std::move(lock)));
+   }
+}
+
+template <typename T, typename M>
 template <typename TimePoint>
 auto plain_guarded<T, M>::try_lock_until(const TimePoint &tp) -> handle
 {
@@ -189,6 +258,19 @@ auto plain_guarded<T, M>::try_lock_until(const TimePoint &tp) -> handle
    } else {
       return handle(nullptr, deleter(std::move(lock)));
    }
+}
+
+template <typename T, typename M>
+template <typename TimePoint>
+auto plain_guarded<T, M>::try_lock_until(const TimePoint &tp) const -> const_handle
+{
+    std::unique_lock<M> lock(m_mutex, tp);
+
+    if (lock.owns_lock()) {
+        return const_handle(&m_obj, const_deleter(std::move(lock)));
+    } else {
+        return const_handle(nullptr, const_deleter(std::move(lock)));
+    }
 }
 
 template <typename T, typename M = std::mutex>
