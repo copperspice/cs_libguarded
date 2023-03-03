@@ -80,3 +80,50 @@ TEMPLATE_TEST_CASE("read lock basic", "[read_lock]", shared_guarded<int>, cow_gu
       REQUIRE(*(data.lock()) == 20000);
    }
 }
+
+TEMPLATE_TEST_CASE("read lock const", "[read_lock]", plain_guarded<int>)
+{
+   SECTION("test multiple read lock")
+   {
+      TestType data(0);
+
+      {
+         auto data_handle = data.lock();
+
+         ++(*data_handle);
+      }
+
+      {
+         const auto& const_data = data;
+         std::thread th1([&const_data]() { auto data_handle = const_data.lock(); });
+         std::thread th2([&const_data]() { auto data_handle = const_data.lock(); });
+
+         th1.join();
+         th2.join();
+      }
+   }
+
+   SECTION("test multiple writers")
+   {
+      TestType data(0);
+
+      std::thread th1([&data]() {
+         for (int i = 0; i < 10000; ++i) {
+            auto data_handle = data.lock();
+            ++(*data_handle);
+         }
+      });
+
+      std::thread th2([&data]() {
+         for (int i = 0; i < 10000; ++i) {
+            auto data_handle = data.lock();
+            ++(*data_handle);
+         }
+      });
+
+      th1.join();
+      th2.join();
+
+      REQUIRE(*(data.lock()) == 20000);
+   }
+}
