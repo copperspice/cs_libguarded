@@ -19,6 +19,8 @@
 #define CSLIBGUARDED_LOCK_GUARDS_H
 
 #include <algorithm>
+#include <array>
+#include <tuple>
 #include <utility>
 
 namespace libguarded
