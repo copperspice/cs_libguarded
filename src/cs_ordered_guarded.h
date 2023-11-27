@@ -56,6 +56,14 @@ class ordered_guarded
       template <typename... Us>
       ordered_guarded(Us &&... data);
 
+      /**
+        Construct a guarded object which uses an allocator. This
+        constructor will accept any number of parameters, all of which
+        are forwarded to the constructor of T.
+       */
+      template <typename Alloc, typename... Us>
+      ordered_guarded(std::allocator_arg_t, Alloc alloc, Us &&... data);
+
       template <typename Func>
       decltype(auto) modify(Func &&func);
 
@@ -102,6 +110,16 @@ template <typename T, typename M>
 template <typename... Us>
 ordered_guarded<T, M>::ordered_guarded(Us &&... data)
    : m_obj(std::forward<Us>(data)...)
+{
+}
+
+template <typename T, typename M>
+template <typename Alloc, typename... Us>
+ordered_guarded<T, M>::ordered_guarded(
+   std::allocator_arg_t,
+   Alloc alloc,
+   Us &&... data)
+   : m_obj(std::forward<Us>(data)..., alloc)
 {
 }
 
@@ -163,5 +181,11 @@ auto ordered_guarded<T, M>::try_lock_shared_until(const TimePoint &timepoint) co
 }
 
 }  // namespace libguarded
+
+template<typename T, typename M, typename Alloc>
+struct std::uses_allocator<libguarded::ordered_guarded<T, M>, Alloc>
+   : std::uses_allocator<T, Alloc>::type
+{
+};
 
 #endif

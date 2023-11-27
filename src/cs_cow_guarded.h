@@ -73,6 +73,14 @@ class cow_guarded
       cow_guarded(Us &&... data);
 
       /**
+        Construct a cow_guarded guarded object which uses an allocator. This
+        constructor will accept any number of parameters, all of which
+        are forwarded to the constructor of T.
+       */
+      template <typename Alloc, typename... Us>
+      cow_guarded(std::allocator_arg_t, Alloc alloc, Us &&... data);
+
+      /**
         Acquire a handle to the protected object. As a side effect, the
         protected object will be locked from access by any other
         thread. The lock will be automatically released when the handle
@@ -221,6 +229,16 @@ cow_guarded<T, M>::cow_guarded(Us &&... data)
 }
 
 template <typename T, typename M>
+template <typename Alloc, typename... Us>
+cow_guarded<T, M>::cow_guarded(
+   std::allocator_arg_t,
+   Alloc alloc,
+   Us &&... data)
+   : m_data(std::allocate_shared<T>(alloc, std::forward<Us>(data)...))
+{
+}
+
+template <typename T, typename M>
 auto cow_guarded<T, M>::lock() -> handle
 {
    std::unique_lock<M> guard(m_writeMutex);
@@ -337,5 +355,11 @@ auto cow_guarded<T, M>::try_lock_shared_until(const TimePoint &timepoint) const 
 }
 
 }  // namespace libguarded
+
+template<typename T, typename M, typename Alloc>
+struct std::uses_allocator<libguarded::cow_guarded<T, M>, Alloc>
+   : std::uses_allocator<T, Alloc>::type
+{
+};
 
 #endif

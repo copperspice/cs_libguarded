@@ -52,6 +52,9 @@ class shared_guarded
       template <typename... Us>
       shared_guarded(Us &&... data);
 
+      template <typename Alloc, typename... Us>
+      shared_guarded(std::allocator_arg_t, Alloc alloc, Us &&... data);
+
       // exclusive access
       [[nodiscard]] handle lock();
       [[nodiscard]] handle try_lock();
@@ -139,6 +142,16 @@ template <typename T, typename M, typename L>
 template <typename... Us>
 shared_guarded<T, M, L>::shared_guarded(Us &&... data)
    : m_obj(std::forward<Us>(data)...)
+{
+}
+
+template <typename T, typename M, typename L>
+template <typename Alloc, typename... Us>
+shared_guarded<T, M, L>::shared_guarded(
+   std::allocator_arg_t,
+   Alloc alloc,
+   Us &&... data)
+   : m_obj(std::forward<Us>(data)..., alloc)
 {
 }
 
@@ -233,5 +246,11 @@ auto shared_guarded<T, M, L>::try_lock_shared_until(const TimePoint &tp) const -
 }
 
 }  // namespace libguarded
+
+template<typename T, typename M, typename L, typename Alloc>
+struct std::uses_allocator<libguarded::shared_guarded<T, M, L>, Alloc>
+   : std::uses_allocator<T, Alloc>::type
+{
+};
 
 #endif
