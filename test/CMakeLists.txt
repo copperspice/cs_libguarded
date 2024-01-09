@@ -1,5 +1,3 @@
-include(Load_Catch2)
-
 find_package(Threads REQUIRED)
 
 include(CTest)
@@ -10,12 +8,12 @@ add_executable(CsLibGuardedTest "")
 target_link_libraries(CsLibGuardedTest
    PUBLIC
    CsLibGuarded
-   Catch2::Catch2
    Threads::Threads
 )
 
 target_sources(CsLibGuardedTest
    PRIVATE
+   ${CMAKE_CURRENT_SOURCE_DIR}/catch2/catch.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/test_cow.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/test_deferred.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/test_lock.cpp
