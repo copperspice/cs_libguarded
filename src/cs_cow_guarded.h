@@ -176,7 +176,7 @@ class cow_guarded
                } else if (ptr && m_guarded) {
                   std::shared_ptr<const T> newPtr(ptr);
 
-                  m_guarded->m_data.modify([newPtr](std::shared_ptr<const T> &ptr) { ptr = newPtr; });
+                  m_guarded->m_data.modify([newPtr](std::shared_ptr<const T> &tmpPtr) { tmpPtr = newPtr; });
                }
 
                if (m_lock.owns_lock()) {

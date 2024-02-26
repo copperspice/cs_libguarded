@@ -65,13 +65,14 @@ TEST_CASE("RCU guarded 1", "[rcu_guarded]")
       auto h = my_list.lock_read();
 
       int count = 0;
-      volatile int escape;
+      volatile int escape = 0;
 
       for (auto &item : *h) {
          escape = item;
          ++count;
       }
       REQUIRE(count == 0);
+      REQUIRE(escape == 0);
    }
 
    {
@@ -89,6 +90,8 @@ TEST_CASE("RCU guarded 1", "[rcu_guarded]")
                for (auto item : *rh) {
                   escape = item;
                }
+
+               (void) escape;
             }
          });
 
@@ -103,25 +106,29 @@ TEST_CASE("RCU guarded 1", "[rcu_guarded]")
                   escape = item;
                }
 
-               for (int i = 0; i < 2; ++i) {
-                  wh->emplace_back(i);
-                  wh->emplace_front(i - 1);
-                  wh->emplace(wh->begin(), i);
+               (void) escape;
+
+               for (int j = 0; j < 2; ++j) {
+                  wh->emplace_back(j);
+                  wh->emplace_front(j - 1);
+                  wh->emplace(wh->begin(), j);
                   auto iter = wh->begin();
 
-                  for(int count = 0; count < 500; ++count) {
+                  for (int k = 0; k < 500; ++k) {
                      auto last = iter;
                      ++iter;
-                     if(iter == wh->end()) {
-                        wh->emplace(last, i - 50);
+
+                     if (iter == wh->end()) {
+                        wh->emplace(last, j - 50);
                         break;
                      }
                   }
 
-                  wh->emplace(++(wh->begin()), i);
-                  wh->push_back(i + 4);
-                  wh->push_front(i - 7);
+                  wh->emplace(++(wh->begin()), j);
+                  wh->push_back(j + 4);
+                  wh->push_front(j - 7);
                }
+
                ++count;
             }
 
@@ -160,6 +167,9 @@ TEST_CASE("RCU guarded 1", "[rcu_guarded]")
          escape = item;
          ++count;
      }
+
+     (void) escape;
+
      REQUIRE(count == 0);
    }
 }
@@ -178,12 +188,12 @@ class mock_allocator
       using value_type = T;
 
       explicit mock_allocator(event_log *log)
-         : log(log)
+         : m_log(log)
       {
       }
 
       mock_allocator(const mock_allocator& other)
-         : log(other.log)
+         : m_log(other.m_log)
       {
       }
 
@@ -191,13 +201,13 @@ class mock_allocator
       template <typename> friend class mock_allocator;
       template <typename U>
       mock_allocator(const mock_allocator<U>& other)
-         : log(other.log)
+         : m_log(other.m_log)
       {
       }
 
       T *allocate(size_t n, const void *hint = nullptr) {
          auto p = std::allocator<T>{}.allocate(n, hint);
-         log->emplace_back(event{n * sizeof(T), true});
+         m_log->emplace_back(event{n * sizeof(T), true});
 
          return p;
       }
@@ -206,12 +216,12 @@ class mock_allocator
          std::allocator<T>{}.deallocate(p, n);
 
          if (p) {
-            log->emplace_back(event{n * sizeof(T), false});
+            m_log->emplace_back(event{n * sizeof(T), false});
          }
       }
 
    private:
-      event_log *const log;
+      event_log *const m_log;
 };
 
 TEST_CASE("RCU guarded 2", "[rcu_guarded]")
