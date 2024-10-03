@@ -64,6 +64,14 @@ class lr_guarded
       lr_guarded(Us &&... data);
 
       /**
+        Construct a lr_guarded guarded object which uses an allocator. This
+        constructor will accept any number of parameters, all of which
+        are forwarded to the constructor of T.
+       */
+      template <typename Alloc, typename... Us>
+      lr_guarded(std::allocator_arg_t, Alloc alloc, Us &&... data);
+
+      /**
         Modify the data by passing a functor. The functor must take
         exactly one argument of type T&. The functor will be called
         twice, once for each copy of the data. It must make the same
@@ -150,6 +158,17 @@ template <typename T, typename M>
 template <typename... Us>
 lr_guarded<T, M>::lr_guarded(Us &&... data)
    : m_left(std::forward<Us>(data)...), m_right(m_left), m_readingLeft(true), m_countingLeft(true),
+     m_leftReadCount(0), m_rightReadCount(0)
+{
+}
+
+template <typename T, typename M>
+template <typename Alloc, typename... Us>
+lr_guarded<T, M>::lr_guarded(
+   std::allocator_arg_t,
+   Alloc alloc,
+   Us &&... data)
+   : m_left(std::forward<Us>(data)..., alloc), m_right(m_left), m_readingLeft(true), m_countingLeft(true),
      m_leftReadCount(0), m_rightReadCount(0)
 {
 }
@@ -262,5 +281,11 @@ auto lr_guarded<T, M>::try_lock_shared_until(const TimePoint &) const -> shared_
 }
 
 }  // namespace libguarded
+
+template<typename T, typename M, typename Alloc>
+struct std::uses_allocator<libguarded::lr_guarded<T, M>, Alloc>
+   : std::uses_allocator<T, Alloc>::type
+{
+};
 
 #endif
