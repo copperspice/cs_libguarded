@@ -3,7 +3,7 @@ add_library(CsLibGuarded::CsLibGuarded ALIAS CsLibGuarded)
 
 target_compile_features(CsLibGuarded
    INTERFACE
-   cxx_std_17
+   cxx_std_20
 )
 
 target_include_directories(CsLibGuarded
