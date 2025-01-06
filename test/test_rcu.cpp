@@ -205,8 +205,8 @@ class mock_allocator
       {
       }
 
-      T *allocate(size_t n, const void *hint = nullptr) {
-         auto p = std::allocator<T>{}.allocate(n, hint);
+      T *allocate(size_t n) {
+         auto p = std::allocator<T>{}.allocate(n);
          m_log->emplace_back(event{n * sizeof(T), true});
 
          return p;
