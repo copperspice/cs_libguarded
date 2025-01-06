@@ -12,28 +12,29 @@ idea of this library is to tie the data and the locks in a type safe interface t
 
 ### System Requirements
 
-To use CsLibGuarded you will need a C++17 compiler which fully supports the C++17 standard library.
+Building CsLibGuarded requires a C++20 compiler and a C++20 standard library.
 
-CMake is only for building and running the unit test suite. This library has been tested with clang thread sanitizer,
-multiple code reviews, and production software.
+CMake build files are provided with the source distribution. The unit test binary executable is
+an optional part of the build process.
+
+This library has been tested with clang sanitizer and an extensive industry code review.
 
 
 ### Documentation
 
 Class level documentation for CsLibGuarded is available on the CopperSpice website:
 
-www.copperspice.com/docs/cs_libguarded/index.html
+https://www.copperspice.com/docs/cs_libguarded/index.html
 
 
 ### Presentations
 
-Our YouTube channel contains over 65 videos about C++, programming fundamentals, Unicode/Strings, multithreading,
+Our YouTube channel contains over 75 videos about C++, programming fundamentals, Unicode/Strings, multithreading,
 graphics, CopperSpice, DoxyPress, and other software development topics.
 
 https://www.youtube.com/copperspice
 
-
-Links to additional vidoes can be found on our website.
+Links to additional videos can be found on our website.
 
 https://www.copperspice.com/presentations.html
 
@@ -55,11 +56,14 @@ this project.
 
 ### References
 
-* Website:  https://www.copperspice.com
-* Twitter:  https://twitter.com/copperspice_cpp
-* Email:    info@copperspice.com
+ * Website:  https://www.copperspice.com
+ * Twitter:  https://twitter.com/copperspice_cpp
+ * Email:    info@copperspice.com
 
-* Github:   https://github.com/copperspice
+<!-- -->
+ * Github:   https://github.com/copperspice
 
-* Forum:    https://forum.copperspice.com
-* Journal:  https://journal.copperspice.com
+<!-- -->
+ * Forum:    https://forum.copperspice.com
+ * Journal:  https://journal.copperspice.com
+
