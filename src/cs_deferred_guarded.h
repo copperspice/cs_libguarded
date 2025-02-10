@@ -57,6 +57,9 @@ class deferred_guarded
       template <typename... Us>
       deferred_guarded(Us &&... data);
 
+      template <typename Alloc, typename... Us>
+      deferred_guarded(std::allocator_arg_t, Alloc alloc, Us &&... data);
+
       template <typename Func>
       void modify_detach(Func && func);
 
@@ -109,6 +112,16 @@ template <typename T, typename M>
 template <typename... Us>
 deferred_guarded<T, M>::deferred_guarded(Us &&... data)
    : m_obj(std::forward<Us>(data)...), m_pendingWrites(false)
+{
+}
+
+template <typename T, typename M>
+template <typename Alloc, typename... Us>
+deferred_guarded<T, M>::deferred_guarded(
+   std::allocator_arg_t,
+   Alloc alloc,
+   Us &&... data)
+   : m_obj(std::forward<Us>(data)..., alloc), m_pendingWrites(false)
 {
 }
 
@@ -295,5 +308,11 @@ auto deferred_guarded<T, M>::try_lock_shared_until(const TimePoint & tp) const -
 }
 
 }  // namespace libguarded
+
+template<typename T, typename M, typename Alloc>
+struct std::uses_allocator<libguarded::deferred_guarded<T, M>, Alloc>
+   : std::uses_allocator<T, Alloc>::type
+{
+};
 
 #endif
