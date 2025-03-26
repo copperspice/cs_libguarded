@@ -16,9 +16,9 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 project(cs_libguarded)
 
-set(BUILD_MAJOR "1")
-set(BUILD_MINOR "4")
-set(BUILD_MICRO "2")
+set(BUILD_MAJOR "2")
+set(BUILD_MINOR "0")
+set(BUILD_MICRO "0")
 
 set(BUILD_COMPONENTS "cs_libguarded")
 
