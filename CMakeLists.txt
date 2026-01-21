@@ -103,13 +103,7 @@ else()
 endif()
 
 # destination for cmake export files
-if (CMAKE_SYSTEM_NAME MATCHES "Windows")
-   set(PKG_PREFIX "cmake/CsLibGuarded")
-
-else()
-   set(PKG_PREFIX "${CMAKE_INSTALL_LIBDIR}/cmake/CsLibGuarded")
-
-endif()
+set(PKG_PREFIX "${CMAKE_INSTALL_LIBDIR}/cmake/CsLibGuarded")
 
 # catch2 set up
 if(BUILD_TESTS)
