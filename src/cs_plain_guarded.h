@@ -58,6 +58,14 @@ class plain_guarded
       plain_guarded(Us &&... data);
 
       /**
+        Construct a guarded object which uses an allocator. This
+        constructor will accept any number of parameters, all of which
+        are forwarded to the constructor of T.
+       */
+      template <typename Alloc, typename... Us>
+      plain_guarded(std::allocator_arg_t, Alloc alloc, Us &&... data);
+
+      /**
         Acquire a handle to the protected object. As a side effect, the
         protected object will be locked from access by any other
         thread. The lock will be automatically released when the handle
@@ -184,6 +192,16 @@ plain_guarded<T, M>::plain_guarded(Us &&... data)
 }
 
 template <typename T, typename M>
+template <typename Alloc, typename... Us>
+plain_guarded<T, M>::plain_guarded(
+   std::allocator_arg_t,
+   Alloc alloc,
+   Us &&... data)
+   : m_obj(std::forward<Us>(data)..., alloc)
+{
+}
+
+template <typename T, typename M>
 auto plain_guarded<T, M>::lock() -> handle
 {
    std::unique_lock<M> lock(m_mutex);
@@ -277,5 +295,11 @@ template <typename T, typename M = std::mutex>
 using guarded [[deprecated("renamed to plain_guarded")]] = plain_guarded<T, M>;
 
 }  // namespace libguarded
+
+template<typename T, typename M, typename Alloc>
+struct std::uses_allocator<libguarded::plain_guarded<T, M>, Alloc>
+   : std::uses_allocator<T, Alloc>::type
+{
+};
 
 #endif
