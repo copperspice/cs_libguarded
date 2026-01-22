@@ -23,7 +23,7 @@ project(cs_libguarded)
 
 set(BUILD_MAJOR "2")
 set(BUILD_MINOR "0")
-set(BUILD_MICRO "0")
+set(BUILD_MICRO "1")
 
 set(BUILD_COMPONENTS "cs_libguarded")
 
